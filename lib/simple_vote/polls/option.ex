@@ -1,17 +1,17 @@
-defmodule SimpleVote.Polls.Prompt do
+defmodule SimpleVote.Polls.Option do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "prompts" do
+  schema "options" do
     field :body, :string
-    has_many :options, SimpleVote.Polls.Option
+    belongs_to :prompt, SimpleVote.Polls.Prompt
 
     timestamps()
   end
 
   @doc false
-  def changeset(prompt, attrs) do
-    prompt
+  def changeset(option, attrs) do
+    option
     |> cast(attrs, [:body])
     |> validate_required([:body])
   end
