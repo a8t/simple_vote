@@ -54,7 +54,7 @@ defmodule SimpleVoteWeb.PromptLiveTest do
     test "updates prompt in listing", %{conn: conn, prompt: prompt} do
       {:ok, index_live, _html} = live(conn, Routes.prompt_index_path(conn, :index))
 
-      assert index_live |> element("#prompt-#{prompt.id} a", "Edit") |> render_click() =~
+      assert index_live |> element("#prompt-#{prompt.id} a", "Edit body") |> render_click() =~
                "Edit Prompt"
 
       assert_patch(index_live, Routes.prompt_index_path(conn, :edit, prompt))
