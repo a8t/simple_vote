@@ -1,0 +1,50 @@
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, SimpleVoteWeb.PromptLive.FormComponent,
+    id: @prompt.id || :new,
+    title: @page_title,
+    action: @live_action,
+    prompt: @prompt,
+    return_to: Routes.prompt_index_path(@socket, :index) %>
+<% end %>
+
+<main class="bg-gray-100 w-full flex flex-col">
+  <div class="container mx-auto max-w-3xl">
+    <%= live_patch to: Routes.prompt_index_path(@socket, :new), id: "new-prompt", class: "button flex items-center self-end" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg> New prompt 
+    <%= end %>
+  </div>
+
+  <%= for prompt <- @prompts do %>
+    <div class="bg-gray-100 w-full" id="prompt-<%= prompt.id %>">
+      <div class="mt-8 max-w-3xl mx-auto">
+        <section>
+          <div class="bg-white shadow sm:rounded-lg">
+            <%= live_patch to: Routes.prompt_show_path(@socket, :show, prompt) do %>
+              <div class="px-4 py-5 sm:px-6">
+                <span class="text-gray-500 text-xs">
+                  Prompt
+                </span>
+
+                <h2 i class="text-lg leading-6 text-gray-900 flex items-center hover:text-blue-700">
+                  <%= prompt.body %>
+                </h2>
+
+              </div>
+            <% end %>
+
+            <div href="#" class="block bg-gray-50 text-sm font-medium text-gray-500 text-center px-4 pb-4 hover:text-gray-700 sm:rounded-b-lg flex justify-end">
+              <%= live_patch "Edit body", to: Routes.prompt_index_path(@socket, :edit, prompt), class: "button" %>
+              <%= link "Delete", to: "#", phx_click: "delete", phx_value_id: prompt.id, data: [confirm: "Are you sure?"], class: "button button-danger  ml-2" %>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  <% end %>
+
+</main>

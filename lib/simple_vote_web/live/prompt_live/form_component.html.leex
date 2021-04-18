@@ -1,0 +1,14 @@
+<h2 class="text-lg leading-6 font-medium text-gray-900"><%= @title %></h2>
+
+<%= f = form_for @changeset, "#",
+  id: "prompt-form",
+  class: "mt-8",
+  phx_target: @myself,
+  phx_change: "validate",
+  phx_submit: "save" %>
+
+<%= label f, :body %>
+<%= textarea f, :body, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"  %>
+<%= error_tag f, :body %>
+<%= submit "Save", phx_disable_with: "Saving...", class: class="mt-4 bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+</form>

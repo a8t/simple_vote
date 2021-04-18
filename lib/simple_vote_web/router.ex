@@ -18,6 +18,13 @@ defmodule SimpleVoteWeb.Router do
     pipe_through :browser
 
     live "/", PageLive, :index
+
+    live "/prompts", PromptLive.Index, :index
+    live "/prompts/new", PromptLive.Index, :new
+    live "/prompts/:id/edit", PromptLive.Index, :edit
+
+    live "/prompts/:id", PromptLive.Show, :show
+    live "/prompts/:id/show/edit", PromptLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
