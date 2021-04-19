@@ -33,7 +33,7 @@ defmodule SimpleVote.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.7"},
+      {:phoenix, "~> 1.5.8"},
       {:phoenix_ecto, "~> 4.1"},
       {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
@@ -49,8 +49,7 @@ defmodule SimpleVote.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:ex_machina, "~> 2.7.0"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:surface, "~> 0.3.0"}
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 

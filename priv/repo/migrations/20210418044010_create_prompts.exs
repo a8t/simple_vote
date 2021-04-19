@@ -7,6 +7,5 @@ defmodule SimpleVote.Repo.Migrations.CreatePrompts do
 
       timestamps()
     end
-
   end
 end
