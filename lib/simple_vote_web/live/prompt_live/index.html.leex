@@ -9,7 +9,7 @@
 
 <main class="bg-gray-100 w-full flex flex-col">
   <div class="container mx-auto max-w-3xl">
-    <%= live_patch to: Routes.prompt_index_path(@socket, :new), id: "new-prompt", class: "button flex items-center self-end" do %>
+    <%= live_patch to: Routes.prompt_index_path(@socket, :new), replace: true, id: "new-prompt", class: "button flex items-center self-end" do %>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg> New prompt 
@@ -35,7 +35,7 @@
             <div href="#" class="flex bg-gray-50 text-sm font-medium text-gray-500 text-center p-4 hover:text-gray-700 sm:rounded-b-lg flex justify-end">
 
               <%= live_patch "Edit options", to: Routes.prompt_show_path(@socket, :show, prompt),  class: "button  mr-2" %>
-              <%= live_patch "Edit body", to: Routes.prompt_index_path(@socket, :edit, prompt), class: "button button-outline mr-auto" %>
+              <%= live_patch "Edit body", to: Routes.prompt_index_path(@socket, :edit, prompt), replace: true, class: "button button-outline mr-auto" %>
               <%= link "Delete", to: "#", phx_click: "delete", phx_value_id: prompt.id, data: [confirm: "Are you sure?"], class: "button button-danger  ml-2" %>
             </div>
 
