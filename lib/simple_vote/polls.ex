@@ -115,7 +115,7 @@ defmodule SimpleVote.Polls do
   """
   def list_prompt_options(prompt_id) do
     query =
-      from o in "options",
+      from o in Option,
         where: o.prompt_id == ^prompt_id
 
     Repo.all(query)
