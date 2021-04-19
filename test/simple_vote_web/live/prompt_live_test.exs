@@ -2,20 +2,14 @@ defmodule SimpleVoteWeb.PromptLiveTest do
   use SimpleVoteWeb.ConnCase
 
   import Phoenix.LiveViewTest
-
-  alias SimpleVote.Polls
+  import SimpleVote.Factory
 
   @create_attrs %{body: "some body"}
   @update_attrs %{body: "some updated body"}
   @invalid_attrs %{body: nil}
 
-  defp fixture(:prompt) do
-    {:ok, prompt} = Polls.create_prompt(@create_attrs)
-    prompt
-  end
-
   defp create_prompt(_) do
-    prompt = fixture(:prompt)
+    prompt = insert(:prompt)
     %{prompt: prompt}
   end
 
@@ -112,5 +106,24 @@ defmodule SimpleVoteWeb.PromptLiveTest do
       assert html =~ "Prompt updated successfully"
       assert html =~ "some updated body"
     end
+  end
+
+  defp create_prompt_and_option(_) do
+    prompt = insert(:prompt)
+    option = insert(:option, prompt: prompt)
+    %{prompt: prompt, option: option}
+  end
+
+  describe "Options" do
+    setup [:create_prompt_and_option]
+
+    test "displays option", %{conn: conn, prompt: prompt, option: option} do
+      {:ok, _show_live, html} = live(conn, Routes.prompt_show_path(conn, :show, prompt))
+
+      assert html =~ "Show Prompt"
+      assert html =~ prompt.body
+      assert html =~ option.body
+    end
+
   end
 end

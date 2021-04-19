@@ -34,6 +34,15 @@
             Options
           </span>
 
+          <ul class="flex flex-col space-y-2 mt-2">
+            <%= for option <- @options do %>
+              <li class="flex items-center relative rounded-lg border border-gray-300 bg-white shadow-sm px-6 py-4 hover:border-gray-400 sm:flex sm:justify-between focus-within:ring-1 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                <p class="text-sm font-medium text-gray-900">
+                  <%= option.body %>
+                </p>
+              </li>
+            <% end %>
+          </ul>
         </div>
         <div>
           <a href="#" class="block bg-gray-50 text-sm font-medium text-gray-500 text-center px-4 py-4 hover:text-gray-700 sm:rounded-b-lg">Read full application</a>
