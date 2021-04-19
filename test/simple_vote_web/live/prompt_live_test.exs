@@ -125,5 +125,27 @@ defmodule SimpleVoteWeb.PromptLiveTest do
       assert html =~ option.body
     end
 
+    test "saves new option", %{conn: conn, prompt: prompt} do
+      {:ok, show_live, _html} = live(conn, Routes.prompt_show_path(conn, :show, prompt))
+
+      assert show_live |> element("#new-option") |> render_click() =~
+               "New Option"
+
+      assert_patch(show_live, Routes.prompt_show_path(conn, :new_option, prompt))
+
+      assert show_live
+             |> form("#option-form", option: @invalid_attrs)
+             |> render_change() =~ "t be blank"
+
+      {:ok, _, html} =
+        show_live
+        |> form("#option-form", option: @create_attrs)
+        |> render_submit()
+        |> follow_redirect(conn, Routes.prompt_show_path(conn, :show, prompt))
+
+      assert html =~ "Option created successfully"
+      assert html =~ "some body"
+    end
+
   end
 end

@@ -10,6 +10,11 @@ defmodule SimpleVoteWeb.PromptLive.Show do
   end
 
   @impl true
+  def handle_params(params, _url, socket) when socket.assigns.live_action in [:new_option] do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  @impl true
   def handle_params(%{"id" => id}, _, socket) do
     prompt = Polls.get_prompt!(id)
     options = Polls.list_prompt_options(id)
@@ -21,6 +26,17 @@ defmodule SimpleVoteWeb.PromptLive.Show do
       |> assign(:options, options)
 
     {:noreply, socket}
+  end
+
+  defp apply_action(socket, :new_option, %{"id" => id}) do
+    prompt = Polls.get_prompt!(id)
+    options = Polls.list_prompt_options(id)
+
+    socket
+    |> assign(:page_title, "New Option")
+    |> assign(:option, %Option{})
+    |> assign(:prompt, prompt)
+    |> assign(:options, options)
   end
 
   defp page_title(:show), do: "Show Prompt"
