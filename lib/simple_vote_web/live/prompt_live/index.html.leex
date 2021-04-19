@@ -32,10 +32,10 @@
 
             </div>
 
-            <div href="#" class="block bg-gray-50 text-sm font-medium text-gray-500 text-center px-4 pb-4 hover:text-gray-700 sm:rounded-b-lg flex justify-end">
+            <div href="#" class="flex bg-gray-50 text-sm font-medium text-gray-500 text-center p-4 hover:text-gray-700 sm:rounded-b-lg flex justify-end">
 
-              <%= live_patch "Edit options", to: Routes.prompt_show_path(@socket, :show, prompt),  class: "button button-outline" %>
-              <%= live_patch "Edit body", to: Routes.prompt_index_path(@socket, :edit, prompt), class: "button ml-2" %>
+              <%= live_patch "Edit options", to: Routes.prompt_show_path(@socket, :show, prompt),  class: "button  mr-2" %>
+              <%= live_patch "Edit body", to: Routes.prompt_index_path(@socket, :edit, prompt), class: "button button-outline mr-auto" %>
               <%= link "Delete", to: "#", phx_click: "delete", phx_value_id: prompt.id, data: [confirm: "Are you sure?"], class: "button button-danger  ml-2" %>
             </div>
 

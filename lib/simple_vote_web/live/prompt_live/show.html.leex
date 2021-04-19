@@ -54,7 +54,7 @@
             <% end %>
           </ul>
 
-          <div class="container mx-auto max-w-3xl">
+          <div class="container mx-auto max-w-3xl mt-4">
             <%= live_patch to: Routes.prompt_show_path(@socket, :new_option, @prompt), id: "new-option", class: "button button-outline flex items-center self-end" do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -62,9 +62,6 @@
             <% end %>
           </div>
 
-        </div>
-        <div>
-          <a href="#" class="block bg-gray-50 text-sm font-medium text-gray-500 text-center px-4 py-4 hover:text-gray-700 sm:rounded-b-lg">Read full application</a>
         </div>
       </div>
     </section>
