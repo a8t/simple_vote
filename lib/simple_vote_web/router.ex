@@ -27,6 +27,13 @@ defmodule SimpleVoteWeb.Router do
     live "/prompts/:id/show/edit", PromptLive.Show, :edit
     live "/prompts/:id/options/new", PromptLive.Show, :new_option
     live "/prompts/:id/options/:option_id/edit", PromptLive.Show, :edit_option
+
+    live "/rooms", RoomLive.Index, :index
+    live "/rooms/new", RoomLive.Index, :new
+    live "/rooms/:id/edit", RoomLive.Index, :edit
+
+    live "/rooms/:id", RoomLive.Show, :show
+    live "/rooms/:id/show/edit", RoomLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
