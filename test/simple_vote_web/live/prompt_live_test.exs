@@ -168,5 +168,12 @@ defmodule SimpleVoteWeb.PromptLiveTest do
       assert html =~ "Option updated successfully"
       assert html =~ "some updated body"
     end
+
+    test "deletes option", %{conn: conn, prompt: prompt, option: option} do
+      {:ok, show_live, _html} = live(conn, Routes.prompt_show_path(conn, :show, prompt))
+
+      assert show_live |> element("#option-#{option.id}-delete") |> render_click()
+      refute has_element?(show_live, "#option-#{option.id}")
+    end
   end
 end

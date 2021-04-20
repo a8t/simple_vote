@@ -55,4 +55,14 @@ defmodule SimpleVoteWeb.PromptLive.Show do
   defp page_title(:show), do: "Show Prompt"
   defp page_title(:edit), do: "Edit Prompt"
   defp page_title(:edit_option), do: "Edit Option"
+
+  @impl true
+  def handle_event("delete_option", %{"prompt-id" => prompt_id, "option-id" => option_id}, socket) do
+    option = Polls.get_option!(option_id)
+    Polls.delete_option(option)
+
+    options = Polls.list_prompt_options(prompt_id)
+
+    {:noreply, assign(socket, options: options)}
+  end
 end
