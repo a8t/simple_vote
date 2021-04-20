@@ -14,9 +14,9 @@ defmodule SimpleVote.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: SimpleVote.PubSub},
       # Start the Endpoint (http/https)
-      SimpleVoteWeb.Endpoint
+      SimpleVoteWeb.Endpoint,
       # Start a worker by calling: SimpleVote.Worker.start_link(arg)
-      # {SimpleVote.Worker, arg}
+      {SimpleVote.Rooms.RoomRegistry, nil}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

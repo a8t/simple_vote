@@ -62,4 +62,22 @@ defmodule SimpleVote.RoomsTest do
     end
   end
 
+  describe "room registry" do
+    alias SimpleVote.Rooms.RoomRegistry
+
+    test "registers" do
+      room_slug = RoomRegistry.get_room_slug("id")
+
+      assert room_slug == RoomRegistry.get_room_slug("id")
+    end
+
+    test "closes" do
+      original_room_slug = RoomRegistry.get_room_slug("id")
+
+      RoomRegistry.close_room(original_room_slug)
+
+      # make sure that the new room slug isn't the same as the original
+      assert original_room_slug != RoomRegistry.get_room_slug("id")
+    end
+  end
 end
