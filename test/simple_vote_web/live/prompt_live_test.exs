@@ -147,5 +147,26 @@ defmodule SimpleVoteWeb.PromptLiveTest do
       assert html =~ "some body"
     end
 
+    test "updates prompt within modal", %{conn: conn, prompt: prompt, option: option} do
+      {:ok, show_live, _html} = live(conn, Routes.prompt_show_path(conn, :show, prompt))
+
+      assert show_live |> element("#option-#{option.id}-edit") |> render_click() =~
+               "Edit Option"
+
+      assert_patch(show_live, Routes.prompt_show_path(conn, :edit_option, prompt, option))
+
+      assert show_live
+             |> form("#option-form", option: @invalid_attrs)
+             |> render_change() =~ "t be blank"
+
+      {:ok, _, html} =
+        show_live
+        |> form("#option-form", option: @update_attrs)
+        |> render_submit()
+        |> follow_redirect(conn, Routes.prompt_show_path(conn, :show, prompt))
+
+      assert html =~ "Option updated successfully"
+      assert html =~ "some updated body"
+    end
   end
 end

@@ -27,6 +27,19 @@ defmodule SimpleVoteWeb.PromptLive.OptionFormComponent do
     save_option(socket, socket.assigns.action, option_params)
   end
 
+  defp save_option(socket, :edit_option, option_params) do
+    case Polls.update_option(socket.assigns.option, option_params) do
+      {:ok, _option} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Option updated successfully")
+         |> push_redirect(to: socket.assigns.return_to)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, :changeset, changeset)}
+    end
+  end
+
   defp save_option(socket, :new_option, option_params) do
     case Polls.create_option_for_prompt(socket.assigns.prompt, option_params) do
       {:ok, _option} ->
