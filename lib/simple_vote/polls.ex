@@ -18,7 +18,10 @@ defmodule SimpleVote.Polls do
 
   """
   def list_prompts do
-    Repo.all(Prompt)
+    query = from p in Prompt, order_by: p.inserted_at
+
+    query
+    |> Repo.all()
   end
 
   @doc """
