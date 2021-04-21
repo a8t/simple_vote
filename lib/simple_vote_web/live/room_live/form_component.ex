@@ -42,11 +42,18 @@ defmodule SimpleVoteWeb.RoomLive.FormComponent do
 
   defp save_room(socket, :new, room_params) do
     case Rooms.create_room(room_params) do
-      {:ok, _room} ->
+      {:ok, room} ->
         {:noreply,
          socket
          |> put_flash(:info, "Room created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> push_redirect(
+           to:
+             Routes.room_show_path(
+               socket,
+               :show,
+               room
+             )
+         )}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

@@ -9,7 +9,9 @@ defmodule SimpleVoteWeb.RoomLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"slug" => slug}, _, socket) do
+    id = Rooms.RoomRegistry.get_room_id(slug)
+
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))

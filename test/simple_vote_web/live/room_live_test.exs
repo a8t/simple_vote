@@ -45,7 +45,7 @@ defmodule SimpleVoteWeb.RoomLiveTest do
         index_live
         |> form("#room-form", room: @create_attrs)
         |> render_submit()
-        |> follow_redirect(conn, Routes.room_index_path(conn, :index))
+        |> follow_redirect(conn)
 
       assert html =~ "Room created successfully"
       assert html =~ "some name"

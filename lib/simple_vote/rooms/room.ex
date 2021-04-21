@@ -14,4 +14,12 @@ defmodule SimpleVote.Rooms.Room do
     |> cast(attrs, [:name])
     |> validate_required([:name])
   end
+
+  defimpl Phoenix.Param, for: SimpleVote.Rooms.Room do
+    def to_param(%{id: id}) do
+      slug = SimpleVote.Rooms.RoomRegistry.get_room_slug(id)
+
+      slug
+    end
+  end
 end

@@ -14,7 +14,9 @@ defmodule SimpleVoteWeb.RoomLive.Index do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :edit, %{"id" => id}) do
+  defp apply_action(socket, :edit, %{"slug" => slug}) do
+    id = Rooms.RoomRegistry.get_room_id(slug)
+
     socket
     |> assign(:page_title, "Edit Room")
     |> assign(:room, Rooms.get_room!(id))
