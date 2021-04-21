@@ -79,5 +79,11 @@ defmodule SimpleVote.RoomsTest do
       # make sure that the new room slug isn't the same as the original
       assert original_room_slug != RoomRegistry.get_room_slug("id")
     end
+
+    test "get_room_id" do
+      room_slug = RoomRegistry.get_room_slug("id")
+
+      assert RoomRegistry.get_room_id(room_slug) == "id"
+    end
   end
 end

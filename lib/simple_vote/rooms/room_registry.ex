@@ -8,7 +8,7 @@ defmodule SimpleVote.Rooms.RoomRegistry do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  @spec get_room_slug(binary()) :: boolean()
+  @spec get_room_slug(binary()) :: binary()
   def get_room_slug(room_id) do
     :ets.match_object(@table, {:_, room_id}) |> hd |> elem(0)
   rescue
@@ -23,6 +23,14 @@ defmodule SimpleVote.Rooms.RoomRegistry do
       room_slug
     else
       open_room(room_id)
+    end
+  end
+
+  @spec get_room_id(binary()) :: binary() | {:error, :no_room_with_slug}
+  def get_room_id(room_slug) do
+    case :ets.lookup(@table, room_slug) do
+      [{^room_slug, id}] -> id
+      _ -> {:error, :no_room_with_slug}
     end
   end
 
