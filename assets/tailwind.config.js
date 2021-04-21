@@ -6,6 +6,11 @@ module.exports = {
     "./js/**/*.js",
   ],
   theme: {},
-  variants: {},
+  variants: {
+    extend: {
+      display: ["last"],
+      visibility: ["last"],
+    },
+  },
   plugins: [require("@tailwindcss/forms")],
 };

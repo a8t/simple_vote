@@ -2,9 +2,16 @@ defmodule SimpleVote.Factory do
   # with Ecto
   use ExMachina.Ecto, repo: SimpleVote.Repo
 
+  def room_factory do
+    %SimpleVote.Rooms.Room{
+      name: "room name"
+    }
+  end
+
   def prompt_factory do
     %SimpleVote.Polls.Prompt{
-      body: "prompt body"
+      body: "prompt body",
+      room: build(:room)
     }
   end
 

@@ -8,7 +8,6 @@ defmodule SimpleVote.PollsTest do
   describe "prompts" do
     alias SimpleVote.Polls.Prompt
 
-    @valid_attrs %{body: "some body"}
     @update_attrs %{body: "some updated body"}
     @invalid_attrs %{body: nil}
 
@@ -23,7 +22,11 @@ defmodule SimpleVote.PollsTest do
     end
 
     test "create_prompt/1 with valid data creates a prompt" do
-      assert {:ok, %Prompt{} = prompt} = Polls.create_prompt(@valid_attrs)
+      room = insert(:room)
+
+      assert {:ok, %Prompt{} = prompt} =
+               Polls.create_prompt(%{body: "some body", room_id: room.id})
+
       assert prompt.body == "some body"
     end
 
@@ -63,7 +66,8 @@ defmodule SimpleVote.PollsTest do
     @invalid_attrs %{body: nil}
 
     test "create_option_for_prompt/1 with valid data creates a option" do
-      prompt = insert(:prompt)
+      room = insert(:room)
+      prompt = insert(:prompt, room: room)
       assert {:ok, %Option{} = option} = Polls.create_option_for_prompt(prompt, @valid_attrs)
       assert option.body == "some body"
     end
@@ -83,7 +87,7 @@ defmodule SimpleVote.PollsTest do
     test "update_option/2 with invalid data returns error changeset" do
       option = insert(:option)
       assert {:error, %Ecto.Changeset{}} = Polls.update_option(option, @invalid_attrs)
-      assert option == Polls.get_option!(option.id) |> SimpleVote.Repo.preload(:prompt)
+      assert option.id == Polls.get_option!(option.id).id
     end
 
     test "delete_option/1 deletes the option" do
