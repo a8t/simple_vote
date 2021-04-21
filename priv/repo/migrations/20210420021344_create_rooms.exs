@@ -7,6 +7,5 @@ defmodule SimpleVote.Repo.Migrations.CreateRooms do
 
       timestamps()
     end
-
   end
 end
