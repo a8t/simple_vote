@@ -31,7 +31,7 @@
   <section class="lg:col-start-3 lg:col-span-1">
     <div class="bg-white shadow sm:rounded-lg sticky top-8">
       <div class="px-4 sm:px-6 py-5">
-        <%= live_patch to: Routes.room_show_path(@socket, :edit, @room) do %>
+        <%= live_patch to: Routes.room_show_path(@socket, :edit, @room), id: "edit-room" do %>
           <span class="text-gray-500 text-xs">
             Room
           </span>

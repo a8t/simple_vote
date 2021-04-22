@@ -8,7 +8,7 @@ defmodule SimpleVoteWeb.PromptComponent do
     <section>
       <div class="bg-white shadow sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 relative">
-          <%= live_patch to: Routes.room_show_path(@socket, :edit_prompt, @room, @prompt), id: "edit-body" do %>
+          <%= live_patch to: Routes.room_show_path(@socket, :edit_prompt, @room, @prompt), id: "prompt-#{@prompt.id}-edit" do %>
             <h2 i class="text-lg leading-6 text-gray-900 flex items-center hover:text-blue-700">
               <span class="font-medium"><%= @prompt.body %> </span>
 
