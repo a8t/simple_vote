@@ -4,8 +4,6 @@ defmodule SimpleVoteWeb.RoomLiveTest do
   import Phoenix.LiveViewTest
   import SimpleVote.Factory
 
-  alias SimpleVote.Rooms
-
   @create_attrs %{name: "some name"}
   @update_attrs %{name: "some updated name"}
   @invalid_attrs %{name: nil}
@@ -224,13 +222,13 @@ defmodule SimpleVoteWeb.RoomLiveTest do
       assert html =~ "some body"
     end
 
-    test "updates prompt within modal", %{conn: conn, prompt: prompt, option: option} do
-      {:ok, show_live, _html} = live(conn, Routes.room_show_path(conn, :show, prompt))
+    test "updates prompt within modal", %{conn: conn, room: room, prompt: prompt, option: option} do
+      {:ok, show_live, _html} = live(conn, Routes.room_show_path(conn, :show, room))
 
       assert show_live |> element("#option-#{option.id}-edit") |> render_click() =~
                "Edit Option"
 
-      assert_patch(show_live, Routes.room_show_path(conn, :edit_option, prompt, option))
+      assert_patch(show_live, Routes.room_show_path(conn, :edit_option, room, prompt, option))
 
       assert show_live
              |> form("#option-form", option: @invalid_option_attrs)
@@ -240,14 +238,14 @@ defmodule SimpleVoteWeb.RoomLiveTest do
         show_live
         |> form("#option-form", option: @update_option_attrs)
         |> render_submit()
-        |> follow_redirect(conn, Routes.room_show_path(conn, :show, prompt))
+        |> follow_redirect(conn, Routes.room_show_path(conn, :show, room))
 
       assert html =~ "Option updated successfully"
       assert html =~ "some updated body"
     end
 
-    test "deletes option", %{conn: conn, prompt: prompt, option: option} do
-      {:ok, show_live, _html} = live(conn, Routes.room_show_path(conn, :show, prompt))
+    test "deletes option", %{conn: conn, room: room, option: option} do
+      {:ok, show_live, _html} = live(conn, Routes.room_show_path(conn, :show, room))
 
       assert show_live |> element("#option-#{option.id}-delete") |> render_click()
       refute has_element?(show_live, "#option-#{option.id}")
