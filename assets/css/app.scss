@@ -115,7 +115,7 @@
   }
 
   .button-danger-ghost {
-    @apply bg-transparent border border-gray-200
+    @apply bg-transparent border border-gray-200;
     @apply text-red-600 hover:bg-red-50;
   }
 
