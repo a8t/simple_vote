@@ -4,6 +4,7 @@ defmodule SimpleVote.Rooms.Room do
 
   schema "rooms" do
     field :name, :string
+    has_many :prompts, SimpleVote.Polls.Prompt
 
     timestamps()
   end

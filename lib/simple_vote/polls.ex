@@ -21,6 +21,27 @@ defmodule SimpleVote.Polls do
     query = from p in Prompt, order_by: p.inserted_at
 
     query
+    |> preload([:room])
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of prompts for a given room
+
+  ## Examples
+
+      iex> list_room_prompts(123)
+      [%Prompt{}, ...]
+
+  """
+  def list_room_prompts(room_id) do
+    query =
+      from p in Prompt,
+        where: p.room_id == ^room_id,
+        order_by: p.inserted_at
+
+    query
+    |> preload([:room, :options])
     |> Repo.all()
   end
 
@@ -38,7 +59,11 @@ defmodule SimpleVote.Polls do
       ** (Ecto.NoResultsError)
 
   """
-  def get_prompt!(id), do: Repo.get!(Prompt, id)
+  def get_prompt!(id) do
+    Prompt
+    |> preload([:room])
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a prompt.

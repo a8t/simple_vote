@@ -19,21 +19,18 @@ defmodule SimpleVoteWeb.Router do
 
     live "/", PageLive, :index
 
-    live "/prompts", PromptLive.Index, :index
-    live "/prompts/new", PromptLive.Index, :new
-    live "/prompts/:id/edit", PromptLive.Index, :edit
-
-    live "/prompts/:id", PromptLive.Show, :show
-    live "/prompts/:id/show/edit", PromptLive.Show, :edit
-    live "/prompts/:id/options/new", PromptLive.Show, :new_option
-    live "/prompts/:id/options/:option_id/edit", PromptLive.Show, :edit_option
-
     live "/rooms", RoomLive.Index, :index
     live "/rooms/new", RoomLive.Index, :new
     live "/rooms/:slug/edit", RoomLive.Index, :edit
 
     live "/rooms/:slug", RoomLive.Show, :show
     live "/rooms/:slug/show/edit", RoomLive.Show, :edit
+
+    live "/rooms/:slug/prompts/new", RoomLive.Show, :new_prompt
+    live "/rooms/:slug/prompts/:prompt_id/edit", RoomLive.Show, :edit_prompt
+
+    live "/rooms/:slug/prompts/:prompt_id/options/new", RoomLive.Show, :new_option
+    live "/rooms/:slug/prompts/:prompt_id/options/:option_id/edit", RoomLive.Show, :edit_option
   end
 
   # Other scopes may use custom stacks.

@@ -5,6 +5,7 @@ defmodule SimpleVote.Polls.Prompt do
   schema "prompts" do
     field :body, :string
     has_many :options, SimpleVote.Polls.Option
+    belongs_to :room, SimpleVote.Rooms.Room
 
     timestamps()
   end
@@ -12,7 +13,7 @@ defmodule SimpleVote.Polls.Prompt do
   @doc false
   def changeset(prompt, attrs) do
     prompt
-    |> cast(attrs, [:body])
-    |> validate_required([:body])
+    |> cast(attrs, [:body, :room_id])
+    |> validate_required([:body, :room_id])
   end
 end

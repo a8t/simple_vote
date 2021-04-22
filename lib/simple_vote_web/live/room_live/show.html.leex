@@ -1,7 +1,5 @@
-<h1>Show Room</h1>
-
 <%= if @live_action in [:edit] do %>
-  <%= live_modal @socket, SimpleVoteWeb.RoomLive.FormComponent,
+  <%= live_modal @socket, SimpleVoteWeb.RoomLive.RoomFormComponent,
     id: @room.id,
     title: @page_title,
     action: @live_action,
@@ -9,14 +7,93 @@
     return_to: Routes.room_show_path(@socket, :show, @room) %>
 <% end %>
 
-<ul>
+<%= if @live_action in [:new_prompt, :edit_prompt] do %>
+  <%= live_modal @socket, SimpleVoteWeb.PromptLive.PromptFormComponent,
+    id: @prompt.id || :new,
+    title: @page_title,
+    action: @live_action,
+    prompt: @prompt,
+    room: @room,
+    return_to: Routes.room_show_path(@socket, :show, @room) %>
+<% end %>
 
-  <li>
-    <strong>Name:</strong>
-    <%= @room.name %>
-  </li>
+<%= if @live_action in [:new_option, :edit_option] do %>
+  <%= live_modal @socket, SimpleVoteWeb.PromptLive.OptionFormComponent,
+    id: @option.id || :new,
+    title: @page_title,
+    action: @live_action,
+    prompt: @prompt, 
+    option: @option,
+    return_to: Routes.room_show_path(@socket, :show, @room) %>
+<% end %>
 
-</ul>
+<div class="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+  <section class="lg:col-start-3 lg:col-span-1">
+    <div class="bg-white shadow sm:rounded-lg sticky top-8">
+      <div class="px-4 sm:px-6 py-5">
+        <%= live_patch to: Routes.room_show_path(@socket, :edit, @room), id: "edit-room" do %>
+          <span class="text-gray-500 text-xs">
+            Room
+          </span>
+          <h2  class="text-lg font-medium text-gray-900 hover:text-blue-700 flex items-center">
+            <%= @room.name %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50 ml-2" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+          </h2>
+        <% end %>
+      </div>
 
-<span><%= live_patch "Edit", to: Routes.room_show_path(@socket, :edit, @room), class: "button" %></span>
-<span><%= live_redirect "Back", to: Routes.room_index_path(@socket, :index) %></span>
+      <div class="border-t border-gray-200 px-4 sm:px-6 py-2">
+        <div class="mt-4">
+          <%= length(@room.prompts) %> prompts
+        </div>
+      </div>
+
+      <div class="bg-indigo-50 p-4 mt-4">
+        <%= live_patch to: Routes.room_show_path(@socket, :new_prompt, @room), replace: true, id: "new-prompt", class: "button flex items-center self-end " do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg> New prompt 
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <div class="space-y-6 lg:col-start-1 lg:col-span-2">
+    <section aria-labelledby="applicant-information-title">
+      <ul class="space-y-10">
+        <%= if length(@prompts) == 0 do %>
+          Add some prompts!
+        <% end %>
+
+        <%= for {prompt, index} <- Enum.with_index(@prompts) do %>
+          <li class="flex relative flex-col">
+
+            <!-- number indicator and line -->
+            <div class="hidden sm:block absolute h-full -left-12 top-4">
+              <span class="absolute top-8 left-4 -ml-px mt-1 h-full w-0.5 bg-gray-200 <%= if (index == length(@prompts) -1), do: "hidden" %>" aria-hidden="true"></span>
+
+              <span class="h-8 w-8 rounded-full bg-blue-400 border-none flex items-center justify-center text-white">
+                <%= index + 1 %>
+              </span>
+            </div>
+
+            <div class="sm:hidden m-auto mb-4 relative">
+              <span class="h-8 w-8 rounded-full bg-blue-400 border-none flex items-center justify-center text-white">
+                <%= index + 1 %>
+              </span>
+
+              <span class="absolute h-2 top-8 left-4 -ml-px mt-1 w-0.5 bg-gray-300" aria-hidden="true"></span>
+
+            </div>
+
+            <div class="flex-grow">
+              <%= live_component @socket, SimpleVoteWeb.PromptComponent, room: @room, prompt: prompt %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  </div>
+</div>
