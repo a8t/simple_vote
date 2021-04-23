@@ -68,11 +68,11 @@
         <% end %>
 
         <%= for {prompt, index} <- Enum.with_index(@prompts) do %>
-          <li class="flex relative flex-col">
+          <li class="flex relative flex-col sm:flex-row">
 
             <!-- number indicator and line -->
-            <div class="hidden sm:block absolute h-full -left-12 top-4">
-              <span class="absolute top-8 left-4 -ml-px mt-1 h-full w-0.5 bg-gray-200 <%= if (index == length(@prompts) -1), do: "hidden" %>" aria-hidden="true"></span>
+            <div class="hidden sm:block h-full mr-4 mt-4">
+              <span class="absolute top-12 left-4 -ml-px mt-1 h-full w-0.5 bg-gray-200 <%= if (index == length(@prompts) -1), do: "hidden" %>" aria-hidden="true"></span>
 
               <span class="h-8 w-8 rounded-full bg-blue-400 border-none flex items-center justify-center text-white">
                 <%= index + 1 %>
