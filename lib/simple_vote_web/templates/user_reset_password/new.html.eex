@@ -1,0 +1,27 @@
+<div class="sm:mx-auto sm:w-full sm:max-w-md">
+  <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    Forgot your password?
+  </h1>
+  <p class="mt-2 text-center text-sm text-gray-600 max-w">
+    Reset your password here.
+  </p>
+</div>
+
+<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+  <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+    <%=  form_for :user, Routes.user_reset_password_path(@conn, :create), [as: :user, class: "flex flex-col space-y-4"], fn f -> %>
+    <div class="input-group">
+      <%= label f, :email %>
+      <%= email_input f, :email, required: true %>
+    </div>
+    <div>
+      <%= submit "Send instructions to reset password", class: "button w-full" %>
+    </div>
+    <div class="m-auto text-sm">
+      <%= link  "Register", to: Routes.user_registration_path(@conn, :new), class: "text-gray-500 hover:text-blue-500" %> |
+      <%= link  "Log in", to: Routes.user_session_path(@conn, :new), class: "text-gray-500 hover:text-blue-500" %>
+    </div>
+  <% end %>
+
+</div>
+</div>
