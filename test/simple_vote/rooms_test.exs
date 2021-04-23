@@ -1,5 +1,5 @@
 defmodule SimpleVote.RoomsTest do
-  use SimpleVote.DataCase
+  use SimpleVote.DataCase, async: true
 
   import SimpleVote.Factory
 
