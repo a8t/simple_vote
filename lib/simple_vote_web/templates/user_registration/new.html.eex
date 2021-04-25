@@ -1,0 +1,42 @@
+<div class="sm:mx-auto sm:w-full sm:max-w-md">
+  <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    Register for SimpleVote
+  </h1>
+  <p class="mt-2 text-center text-sm text-gray-600 max-w">
+    Or
+    <%= link "log into an existing account.", to: Routes.user_session_path(@conn, :new), class: "font-medium text-indigo-600 hover:text-indigo-500" %>
+  </p>
+</div>
+
+<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+  <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+    <%= form_for @changeset, Routes.user_registration_path(@conn, :create), [as: :user, class: "flex flex-col space-y-4"], fn f -> %>
+    <%= if @changeset.action do %>
+      <div class="alert alert-danger">
+        <p>Oops, something went wrong! Please check the errors below.</p>
+      </div>
+    <% end %>
+
+    <div class="input-group">
+
+      <%= label f, :email %>
+      <%= email_input f, :email, required: true %>
+      <%= error_tag f, :email %>
+    </div>
+
+    <div class="input-group">
+      <%= label f, :password %>
+      <%= password_input f, :password, required: true %>
+      <%= error_tag f, :password %>
+    </div>
+    <div>
+      <%= submit "Register", class: "button w-full" %>
+    </div>
+    <div class="m-auto text-sm">
+      <%= link "Log in", to: Routes.user_session_path(@conn, :new) , class: "text-gray-500 hover:text-blue-500" %> |
+      <%= link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new), class: "text-gray-500 hover:text-blue-500" %>
+    </div>
+  <% end %>
+
+</div>
+</div>

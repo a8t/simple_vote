@@ -1,11 +1,22 @@
+const colors = require("tailwindcss/colors");
+
 module.exports = {
+  mode: "jit",
   purge: [
     "../lib/**/*.ex",
     "../lib/**/*.leex",
     "../lib/**/*.eex",
     "./js/**/*.js",
   ],
-  theme: {},
+
+  theme: {
+    extend: {
+      colors: {
+        "light-blue": colors.lightBlue,
+        teal: colors.teal,
+      },
+    },
+  },
   variants: {
     extend: {
       display: ["last"],
