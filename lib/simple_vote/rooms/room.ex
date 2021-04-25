@@ -5,6 +5,7 @@ defmodule SimpleVote.Rooms.Room do
   schema "rooms" do
     field :name, :string
     has_many :prompts, SimpleVote.Polls.Prompt
+    belongs_to :owner, SimpleVote.Accounts.User, foreign_key: :owner_id
 
     timestamps()
   end
@@ -12,8 +13,8 @@ defmodule SimpleVote.Rooms.Room do
   @doc false
   def changeset(room, attrs) do
     room
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :owner_id])
+    |> validate_required([:name, :owner_id])
   end
 
   defimpl Phoenix.Param, for: SimpleVote.Rooms.Room do
