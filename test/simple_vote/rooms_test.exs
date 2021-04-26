@@ -18,13 +18,24 @@ defmodule SimpleVote.RoomsTest do
       assert Rooms.list_rooms() == [room]
     end
 
+    test "list_user_rooms/1 returns all rooms for the right user" do
+      user = insert(:user)
+      room = insert(:room, owner: user)
+      assert Rooms.list_user_rooms(user.id) == [room]
+
+      other_user = insert(:user)
+      assert Rooms.list_user_rooms(other_user.id) == []
+    end
+
     test "get_room!/1 returns the room with given id" do
       room = insert(:room) |> Repo.preload(:prompts)
       assert Rooms.get_room!(room.id) == room
     end
 
     test "create_room/1 with valid data creates a room" do
-      assert {:ok, %Room{} = room} = Rooms.create_room(@valid_attrs)
+      user = insert(:user)
+      attrs = Map.merge(@valid_attrs, %{owner_id: user.id})
+      assert {:ok, %Room{} = room} = Rooms.create_room(attrs)
       assert room.name == "some name"
     end
 

@@ -22,6 +22,23 @@ defmodule SimpleVote.Rooms do
   end
 
   @doc """
+  Returns the list of rooms for a given user.
+
+  ## Examples
+
+      iex> list_user_rooms(123)
+      [%Room{}, ...]
+
+  """
+  def list_user_rooms(user_id) do
+    query =
+      from r in Room,
+        where: r.owner_id == ^user_id
+
+    query |> preload([:owner]) |> Repo.all()
+  end
+
+  @doc """
   Gets a single room.
 
   Raises `Ecto.NoResultsError` if the Room does not exist.

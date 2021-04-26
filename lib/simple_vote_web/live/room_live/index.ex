@@ -1,12 +1,20 @@
 defmodule SimpleVoteWeb.RoomLive.Index do
   use SimpleVoteWeb, :live_view
 
+  alias SimpleVote.Accounts.User
   alias SimpleVote.Rooms
   alias SimpleVote.Rooms.Room
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :rooms, list_rooms())}
+  def mount(_params, session, socket) do
+    socket = assign_user(session, socket)
+
+    with {:ok, %User{} = user} <- get_current_user(socket),
+         rooms <- Rooms.list_user_rooms(user.id) do
+      {:ok, assign(socket, :rooms, rooms)}
+    else
+      _ -> {:ok, assign(socket, :rooms, [])}
+    end
   end
 
   @impl true
