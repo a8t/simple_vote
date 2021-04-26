@@ -21,7 +21,7 @@ defmodule SimpleVote.Polls do
     query = from p in Prompt, order_by: p.inserted_at
 
     query
-    |> preload([:room])
+    |> preload(room: [:owner])
     |> Repo.all()
   end
 
@@ -41,7 +41,7 @@ defmodule SimpleVote.Polls do
         order_by: p.inserted_at
 
     query
-    |> preload([:room, :options])
+    |> preload([:options, room: [:owner]])
     |> Repo.all()
   end
 
@@ -61,7 +61,7 @@ defmodule SimpleVote.Polls do
   """
   def get_prompt!(id) do
     Prompt
-    |> preload([:room])
+    |> preload(room: :owner)
     |> Repo.get!(id)
   end
 

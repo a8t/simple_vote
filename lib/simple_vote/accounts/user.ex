@@ -8,6 +8,7 @@ defmodule SimpleVote.Accounts.User do
     field :password, :string, virtual: true
     field :hashed_password, :string
     field :confirmed_at, :naive_datetime
+    has_many :rooms, SimpleVote.Rooms.Room, foreign_key: :owner_id
 
     timestamps()
   end
@@ -42,7 +43,7 @@ defmodule SimpleVote.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> unsafe_validate_unique(:email, SimpleVote.Repo)
-    |> unique_constraint(:email)
+    |> unique_constraint(:email, name: :users_email_index)
   end
 
   defp validate_password(changeset, opts) do
