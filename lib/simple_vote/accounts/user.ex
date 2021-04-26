@@ -9,6 +9,7 @@ defmodule SimpleVote.Accounts.User do
     field :hashed_password, :string
     field :confirmed_at, :naive_datetime
     has_many :rooms, SimpleVote.Rooms.Room, foreign_key: :owner_id
+    has_many :votes, SimpleVote.Polls.Vote
 
     timestamps()
   end

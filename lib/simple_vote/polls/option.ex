@@ -5,6 +5,7 @@ defmodule SimpleVote.Polls.Option do
   schema "options" do
     field :body, :string
     belongs_to :prompt, SimpleVote.Polls.Prompt
+    has_many :votes, SimpleVote.Polls.Vote
 
     timestamps()
   end

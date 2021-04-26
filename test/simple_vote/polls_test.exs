@@ -101,4 +101,61 @@ defmodule SimpleVote.PollsTest do
       assert %Ecto.Changeset{} = Polls.change_option(option)
     end
   end
+
+  describe "votes" do
+    alias SimpleVote.Polls.Vote
+
+    @update_attrs %{}
+    @invalid_attrs %{}
+
+    test "list_votes/0 returns all votes" do
+      vote = insert(:vote)
+      assert Polls.list_votes() |> length == 1
+      assert Polls.list_votes() |> hd |> Map.get(:id) == vote.id
+    end
+
+    test "get_vote!/1 returns the vote with given id" do
+      vote = insert(:vote)
+      assert Polls.get_vote!(vote.id).id == vote.id
+    end
+
+    test "create_vote/1 with valid data creates a vote" do
+      user = insert(:user)
+      option = insert(:option)
+
+      assert {:ok, %Vote{}} = Polls.create_vote(%{user_id: user.id, option_id: option.id})
+    end
+
+    test "create_vote/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Polls.create_vote(@invalid_attrs)
+    end
+
+    test "update_vote/2 with valid data updates the vote" do
+      vote = insert(:vote)
+      assert {:ok, %Vote{}} = Polls.update_vote(vote, @update_attrs)
+    end
+
+    test "update_vote/2 with invalid data returns error changeset" do
+      vote = insert(:vote)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Polls.update_vote(vote, %{user_id: nil, option_id: nil})
+
+      updated_vote = Polls.get_vote!(vote.id)
+      assert vote.id == updated_vote.id
+      assert vote.user_id == updated_vote.user_id
+      assert vote.option_id == updated_vote.option_id
+    end
+
+    test "delete_vote/1 deletes the vote" do
+      vote = insert(:vote)
+      assert {:ok, %Vote{}} = Polls.delete_vote(vote)
+      assert_raise Ecto.NoResultsError, fn -> Polls.get_vote!(vote.id) end
+    end
+
+    test "change_vote/1 returns a vote changeset" do
+      vote = insert(:vote)
+      assert %Ecto.Changeset{} = Polls.change_vote(vote)
+    end
+  end
 end

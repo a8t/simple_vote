@@ -31,4 +31,11 @@ defmodule SimpleVote.Factory do
       prompt: build(:prompt)
     }
   end
+
+  def vote_factory do
+    %SimpleVote.Polls.Vote{
+      user: build(:user),
+      option: build(:option)
+    }
+  end
 end
