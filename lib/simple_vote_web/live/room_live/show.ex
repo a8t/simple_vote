@@ -16,7 +16,7 @@ defmodule SimpleVoteWeb.RoomLive.Show do
          room = %Rooms.Room{owner_id: ^user_id} <- Rooms.get_room!(room_id) do
       {:ok, assign(socket, :room, room)}
     else
-      _err -> {:ok, redirect(socket, to: "/rooms")}
+      _err -> {:ok, redirect(socket, to: "/rooms/#{slug}/vote")}
     end
   end
 

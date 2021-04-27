@@ -111,7 +111,7 @@ defmodule SimpleVoteWeb.RoomLiveTest do
       assert {:ok, _conn} =
                conn
                |> live(Routes.room_show_path(conn, :show, room))
-               |> follow_redirect(conn, Routes.room_index_path(conn, :index))
+               |> follow_redirect(conn, Routes.room_vote_path(conn, :show, room))
     end
 
     test "updates room within modal", %{authed_conn: authed_conn, room: room} do

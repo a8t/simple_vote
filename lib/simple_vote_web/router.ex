@@ -34,6 +34,8 @@ defmodule SimpleVoteWeb.Router do
 
     live "/rooms/:slug/prompts/:prompt_id/options/new", RoomLive.Show, :new_option
     live "/rooms/:slug/prompts/:prompt_id/options/:option_id/edit", RoomLive.Show, :edit_option
+
+    live "/rooms/:slug/vote", RoomLive.Vote, :show
   end
 
   # Other scopes may use custom stacks.
