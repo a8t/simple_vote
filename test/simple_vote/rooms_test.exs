@@ -88,7 +88,11 @@ defmodule SimpleVote.RoomsTest do
     test "get_room_id" do
       room_slug = RoomRegistry.get_room_slug("id")
 
-      assert RoomRegistry.get_room_id(room_slug) == "id"
+      assert RoomRegistry.get_room_id(room_slug) == {:ok, "id"}
+    end
+
+    test "get_room_id with bad slug" do
+      assert {:error, :no_room_with_slug} = RoomRegistry.get_room_id("bad slug")
     end
   end
 end

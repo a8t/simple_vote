@@ -26,10 +26,10 @@ defmodule SimpleVote.Rooms.RoomRegistry do
     end
   end
 
-  @spec get_room_id(binary()) :: binary() | {:error, :no_room_with_slug}
+  @spec get_room_id(binary()) :: {:error, :no_room_with_slug} | {:ok, binary()}
   def get_room_id(room_slug) do
     case :ets.lookup(@table, room_slug) do
-      [{^room_slug, id}] -> id
+      [{^room_slug, id}] -> {:ok, id}
       _ -> {:error, :no_room_with_slug}
     end
   end

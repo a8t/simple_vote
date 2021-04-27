@@ -23,11 +23,22 @@ defmodule SimpleVoteWeb.RoomLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"slug" => slug}) do
-    id = Rooms.RoomRegistry.get_room_id(slug)
+    with {:ok, room_id} <- Rooms.RoomRegistry.get_room_id(slug) do
+      socket
+      |> assign(:page_title, "Edit Room")
+      |> assign(:room, Rooms.get_room!(room_id))
+    else
+      {:error, :no_room_with_slug} ->
+        socket =
+          socket
+          |> put_flash(:error, "Couldn't find that room.")
+          |> redirect(to: "/rooms")
 
-    socket
-    |> assign(:page_title, "Edit Room")
-    |> assign(:room, Rooms.get_room!(id))
+        {:ok, socket}
+
+      _ ->
+        {:ok, redirect(socket, to: "/rooms")}
+    end
   end
 
   defp apply_action(socket, :new, _params) do

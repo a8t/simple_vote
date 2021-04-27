@@ -58,20 +58,27 @@ defmodule SimpleVoteWeb.RoomLive.Vote do
 
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
-    with room_id <- RoomRegistry.get_room_id(slug),
+    with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
          room = %Rooms.Room{} <- Rooms.get_room!(room_id) do
       {:ok, assign(socket, :room, room)}
     else
-      _err -> {:ok, redirect(socket, to: "/rooms")}
+      {:error, :no_room_with_slug} ->
+        socket =
+          socket
+          |> put_flash(:error, "Couldn't find that room.")
+          |> redirect(to: "/rooms")
+
+        {:ok, socket}
+
+      _err ->
+        {:ok, redirect(socket, to: "/rooms")}
     end
   end
 
   @impl true
   def render(assigns) do
-    IO.inspect(assigns)
-
     ~H"""
-    {{@room.name}}
+    Vote: {{@room.name}}
       <div :for={{ prompt <- @room.prompts }}>
         <SimpleVoteWeb.RoomLive.Vote.Prompt body={{prompt.body}} options={{prompt.options}} />
       </div>

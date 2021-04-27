@@ -11,12 +11,24 @@ defmodule SimpleVoteWeb.RoomLive.Show do
   def mount(%{"slug" => slug}, session, socket) do
     socket = assign_user(session, socket)
 
-    with {:ok, %User{id: user_id}} <- get_current_user(socket),
-         room_id <- RoomRegistry.get_room_id(slug),
+    with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
+         {:ok, %User{id: user_id}} <- get_current_user(socket),
          room = %Rooms.Room{owner_id: ^user_id} <- Rooms.get_room!(room_id) do
       {:ok, assign(socket, :room, room)}
     else
-      _err -> {:ok, redirect(socket, to: "/rooms/#{slug}/vote")}
+      {:error, :no_room_with_slug} ->
+        socket =
+          socket
+          |> put_flash(:error, "Couldn't find that room.")
+          |> redirect(to: "/rooms")
+
+        {:ok, socket}
+
+      {:error, :not_authenticated} ->
+        {:ok, redirect(socket, to: "/rooms/#{slug}/vote")}
+
+      _err ->
+        {:ok, redirect(socket, to: "/rooms")}
     end
   end
 

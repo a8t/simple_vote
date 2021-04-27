@@ -114,6 +114,13 @@ defmodule SimpleVoteWeb.RoomLiveTest do
                |> follow_redirect(conn, Routes.room_vote_path(conn, :show, room))
     end
 
+    test "redirects if bad slug", %{conn: conn} do
+      assert {:ok, _conn} =
+               conn
+               |> live("/rooms/bad_slug")
+               |> follow_redirect(conn, Routes.room_index_path(conn, :index))
+    end
+
     test "updates room within modal", %{authed_conn: authed_conn, room: room} do
       {:ok, show_live, _html} = live(authed_conn, Routes.room_show_path(authed_conn, :show, room))
 
