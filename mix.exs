@@ -51,7 +51,8 @@ defmodule SimpleVote.MixProject do
       {:ex_machina, "~> 2.7.0"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:phx_gen_auth, "~> 0.7", only: [:dev], runtime: false}
+      {:phx_gen_auth, "~> 0.7", only: [:dev], runtime: false},
+      {:surface, "~> 0.3.0"}
     ]
   end
 

@@ -58,6 +58,7 @@ config :simple_vote, SimpleVoteWeb.Endpoint,
 config :simple_vote, SimpleVoteWeb.Endpoint,
   live_reload: [
     patterns: [
+      ~r"lib/my_app_web/live/.*(sface)$",
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/simple_vote_web/(live|views)/.*(ex)$",
