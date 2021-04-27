@@ -52,7 +52,7 @@ defmodule SimpleVote.Rooms do
       ** (Ecto.NoResultsError)
 
   """
-  def get_room!(id), do: Room |> preload([:prompts, :owner]) |> Repo.get!(id)
+  def get_room!(id), do: Room |> preload([:owner, prompts: :options]) |> Repo.get!(id)
 
   @doc """
   Creates a room.

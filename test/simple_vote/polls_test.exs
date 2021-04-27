@@ -12,12 +12,12 @@ defmodule SimpleVote.PollsTest do
     @invalid_attrs %{body: nil}
 
     test "list_prompts/0 returns all prompts" do
-      prompt = insert(:prompt)
+      prompt = insert(:prompt, options: [])
       assert Polls.list_prompts() == [prompt]
     end
 
     test "get_prompt!/1 returns the prompt with given id" do
-      prompt = insert(:prompt)
+      prompt = insert(:prompt, options: [])
       assert Polls.get_prompt!(prompt.id) == prompt
     end
 
@@ -41,7 +41,7 @@ defmodule SimpleVote.PollsTest do
     end
 
     test "update_prompt/2 with invalid data returns error changeset" do
-      prompt = insert(:prompt)
+      prompt = insert(:prompt, options: [])
       assert {:error, %Ecto.Changeset{}} = Polls.update_prompt(prompt, @invalid_attrs)
       assert prompt == Polls.get_prompt!(prompt.id)
     end

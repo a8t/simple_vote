@@ -5,32 +5,30 @@ defmodule SimpleVoteWeb.RoomLive.Show do
   alias SimpleVote.Rooms.RoomRegistry
   alias SimpleVote.Polls
   alias SimpleVote.Polls.{Prompt, Option}
+  alias SimpleVote.Accounts.{User}
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(%{"slug" => slug}, session, socket) do
+    socket = assign_user(session, socket)
+
+    with {:ok, %User{id: user_id}} <- get_current_user(socket),
+         room_id <- RoomRegistry.get_room_id(slug),
+         room = %Rooms.Room{owner_id: ^user_id} <- Rooms.get_room!(room_id) do
+      {:ok, assign(socket, :room, room)}
+    else
+      _err -> {:ok, redirect(socket, to: "/rooms")}
+    end
   end
 
   @impl true
-  def handle_params(
-        %{"slug" => slug, "prompt_id" => prompt_id, "option_id" => option_id},
-        _url,
-        socket
-      ) do
-    with room_id <- RoomRegistry.get_room_id(slug),
-         room = %Rooms.Room{} <- Rooms.get_room!(room_id),
-         prompts <- Polls.list_room_prompts(room.id),
-         prompt = %Prompt{} <- Polls.get_prompt!(prompt_id),
-         options <- Polls.list_prompt_options(prompt_id),
+  def handle_params(%{"prompt_id" => prompt_id, "option_id" => option_id}, _url, socket) do
+    with prompt = %Prompt{} <- Polls.get_prompt!(prompt_id),
          option = %Option{} <- Polls.get_option!(option_id) do
       socket =
         socket
         |> assign(:page_title, page_title(socket.assigns.live_action))
-        |> assign(:room, room)
         |> assign(:prompt, prompt)
-        |> assign(:prompts, prompts)
         |> assign(:option, option)
-        |> assign(:options, options)
 
       {:noreply, socket}
     else
@@ -39,22 +37,12 @@ defmodule SimpleVoteWeb.RoomLive.Show do
   end
 
   @impl true
-  def handle_params(%{"slug" => slug, "prompt_id" => prompt_id}, _url, socket) do
-    option = %Option{}
-
-    with room_id <- RoomRegistry.get_room_id(slug),
-         room = %Rooms.Room{} <- Rooms.get_room!(room_id),
-         prompts <- Polls.list_room_prompts(room.id),
-         prompt = %Prompt{} <- Polls.get_prompt!(prompt_id),
-         options <- Polls.list_prompt_options(prompt_id) do
+  def handle_params(%{"prompt_id" => prompt_id}, _url, socket) do
+    with prompt = %Prompt{} <- Polls.get_prompt!(prompt_id) do
       socket =
         socket
         |> assign(:page_title, page_title(socket.assigns.live_action))
-        |> assign(:room, room)
         |> assign(:prompt, prompt)
-        |> assign(:prompts, prompts)
-        |> assign(:option, option)
-        |> assign(:options, options)
 
       {:noreply, socket}
     else
@@ -63,22 +51,17 @@ defmodule SimpleVoteWeb.RoomLive.Show do
   end
 
   @impl true
-  def handle_params(%{"slug" => slug}, _, socket) do
-    case RoomRegistry.get_room_id(slug) do
-      {:error, _} ->
-        {:noreply, redirect(socket, to: "/rooms")}
+  def handle_params(_params, _url, socket) do
+    room = socket.assigns.room
 
-      id ->
-        socket =
-          socket
-          |> assign(:page_title, page_title(socket.assigns.live_action))
-          |> assign(:room, Rooms.get_room!(id))
-          |> assign(:prompt, %Prompt{})
-          |> assign(:prompts, Polls.list_room_prompts(id))
-          |> assign(:option, %Option{})
+    socket =
+      socket
+      |> assign(:page_title, page_title(socket.assigns.live_action))
+      |> assign_new(:prompts, fn -> room.prompts end)
+      |> assign_new(:prompt, fn -> %Prompt{} end)
+      |> assign_new(:option, fn -> %Option{} end)
 
-        {:noreply, socket}
-    end
+    {:noreply, socket}
   end
 
   defp page_title(:show), do: "Show Room"
