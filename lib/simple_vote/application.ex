@@ -16,7 +16,8 @@ defmodule SimpleVote.Application do
       # Start the Endpoint (http/https)
       SimpleVoteWeb.Endpoint,
       # Start a worker by calling: SimpleVote.Worker.start_link(arg)
-      {SimpleVote.Rooms.RoomRegistry, nil}
+      {SimpleVote.Rooms.RoomRegistry, nil},
+      SimpleVoteWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

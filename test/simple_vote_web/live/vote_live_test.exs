@@ -38,5 +38,15 @@ defmodule SimpleVoteWeb.VoteLiveTest do
                |> live("/rooms/bad_slug/vote")
                |> follow_redirect(conn, Routes.room_index_path(conn, :index))
     end
+
+    test "publishes on join", %{
+      conn: conn,
+      room: room
+    } do
+      {:ok, _show_live, _html} = live(conn, Routes.room_vote_path(conn, :show, room))
+      {:ok, _show_live, html} = live(conn, Routes.room_vote_path(conn, :show, room))
+
+      assert html =~ "Present: 2"
+    end
   end
 end

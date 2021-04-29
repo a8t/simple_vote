@@ -55,12 +55,20 @@ defmodule SimpleVoteWeb.RoomLive.Vote do
 
   alias SimpleVote.Rooms
   alias SimpleVote.Rooms.RoomRegistry
+  alias SimpleVoteWeb.Presence
 
   @impl true
+  @spec mount(map, any, Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(%{"slug" => slug}, _session, socket) do
     with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
-         room = %Rooms.Room{} <- Rooms.get_room!(room_id) do
-      {:ok, assign(socket, :room, room)}
+         room = %Rooms.Room{} <- Rooms.get_room!(room_id),
+         {:ok, present} = join_room(socket, slug) do
+      socket =
+        socket
+        |> assign(:present, present)
+        |> assign(:room, room)
+
+      {:ok, socket}
     else
       {:error, :no_room_with_slug} ->
         socket =
@@ -79,9 +87,38 @@ defmodule SimpleVoteWeb.RoomLive.Vote do
   def render(assigns) do
     ~H"""
     Vote: {{@room.name}}
+    Present: {{@present}}
       <div :for={{ prompt <- @room.prompts }}>
         <SimpleVoteWeb.RoomLive.Vote.Prompt body={{prompt.body}} options={{prompt.options}} />
       </div>
     """
+  end
+
+  defp join_room(socket, slug) do
+    topic = "room:#{slug}"
+
+    # before subscribing, let's get the current_reader_count
+    initial_count =
+      topic
+      |> Presence.list()
+      |> map_size
+
+    # Subscribe to the topic
+    SimpleVoteWeb.Endpoint.subscribe(topic)
+
+    # Track changes to the topic
+    Presence.track(self(), topic, socket.id, %{})
+
+    {:ok, initial_count}
+  end
+
+  @impl true
+  def handle_info(
+        %{event: "presence_diff", payload: %{joins: joins, leaves: leaves}},
+        %{assigns: %{present: count}} = socket
+      ) do
+    present = count + map_size(joins) - map_size(leaves)
+
+    {:noreply, assign(socket, :present, present)}
   end
 end
