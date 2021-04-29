@@ -49,4 +49,14 @@ defmodule SimpleVoteWeb.VoteLiveTest do
       assert html =~ "Present: 2"
     end
   end
+
+  describe "Quick register" do
+    setup [:create_room]
+
+    test "shows form", %{conn: conn, room: room} do
+      {:ok, _show_live, html} = live(conn, Routes.room_vote_path(conn, :register, room))
+
+      assert html =~ "Register now!"
+    end
+  end
 end

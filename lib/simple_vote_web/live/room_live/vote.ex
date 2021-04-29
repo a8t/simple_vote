@@ -85,9 +85,14 @@ defmodule SimpleVoteWeb.RoomLive.Vote do
 
   @impl true
   def render(assigns) do
+    IO.inspect(assigns)
+
     ~H"""
     Vote: {{@room.name}}
     Present: {{@present}}
+      <div :if={{@live_action == :register}}>
+      Register now!
+      </div>
       <div :for={{ prompt <- @room.prompts }}>
         <SimpleVoteWeb.RoomLive.Vote.Prompt body={{prompt.body}} options={{prompt.options}} />
       </div>
