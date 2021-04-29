@@ -13,7 +13,7 @@ defmodule SimpleVoteWeb.RoomLive.Show do
 
     with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
          {:ok, %User{id: user_id}} <- get_current_user(socket),
-         room = %Rooms.Room{owner_id: ^user_id} <- Rooms.get_room!(room_id) do
+         {:ok, room} <- get_owned_room(room_id, user_id) do
       {:ok, assign(socket, :room, room)}
     else
       {:error, :no_room_with_slug} ->
@@ -27,8 +27,19 @@ defmodule SimpleVoteWeb.RoomLive.Show do
       {:error, :not_authenticated} ->
         {:ok, redirect(socket, to: "/rooms/#{slug}/vote")}
 
+      {:error, :wrong_owner} ->
+        {:ok, redirect(socket, to: "/rooms/#{slug}/vote")}
+
       _err ->
         {:ok, redirect(socket, to: "/rooms")}
+    end
+  end
+
+  def get_owned_room(room_id, user_id) do
+    with room = %Rooms.Room{owner_id: ^user_id} <- Rooms.get_room!(room_id) do
+      {:ok, room}
+    else
+      _err -> {:error, :wrong_owner}
     end
   end
 
