@@ -51,7 +51,7 @@ defmodule SimpleVoteWeb.RoomLive.Vote.Prompt do
 end
 
 defmodule SimpleVoteWeb.RoomLive.Vote do
-  use Surface.LiveView
+  use SimpleVoteWeb, :surface_view
 
   alias SimpleVote.Rooms
   alias SimpleVote.Rooms.RoomRegistry
@@ -85,8 +85,6 @@ defmodule SimpleVoteWeb.RoomLive.Vote do
 
   @impl true
   def render(assigns) do
-    IO.inspect(assigns)
-
     ~H"""
     Vote: {{@room.name}}
     Present: {{@present}}
