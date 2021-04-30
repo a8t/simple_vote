@@ -111,7 +111,7 @@ defmodule SimpleVoteWeb.RoomLiveTest do
       assert {:ok, _conn} =
                conn
                |> live(Routes.room_show_path(conn, :show, room))
-               |> follow_redirect(conn, Routes.room_vote_path(conn, :show, room))
+               |> follow_redirect(conn, Routes.room_lobby_path(conn, :show, room))
     end
 
     test "redirects different authenticated user to voting page", %{conn: conn, room: room} do
@@ -122,7 +122,7 @@ defmodule SimpleVoteWeb.RoomLiveTest do
       assert {:ok, _conn} =
                authed_conn
                |> live(Routes.room_show_path(authed_conn, :show, room))
-               |> follow_redirect(authed_conn, Routes.room_vote_path(authed_conn, :show, room))
+               |> follow_redirect(authed_conn, Routes.room_lobby_path(authed_conn, :show, room))
     end
 
     test "redirects if bad slug", %{conn: conn} do

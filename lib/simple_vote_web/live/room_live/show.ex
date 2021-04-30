@@ -25,10 +25,10 @@ defmodule SimpleVoteWeb.RoomLive.Show do
         {:ok, socket}
 
       {:error, :not_authenticated} ->
-        {:ok, redirect(socket, to: "/rooms/#{slug}/vote")}
+        {:ok, redirect(socket, to: "/rooms/#{slug}/lobby")}
 
       {:error, :wrong_owner} ->
-        {:ok, redirect(socket, to: "/rooms/#{slug}/vote")}
+        {:ok, redirect(socket, to: "/rooms/#{slug}/lobby")}
 
       _err ->
         {:ok, redirect(socket, to: "/rooms")}
