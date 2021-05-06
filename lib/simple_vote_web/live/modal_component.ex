@@ -13,7 +13,7 @@ defmodule SimpleVoteWeb.ModalComponent do
       phx-page-loading>
       <div class="phx-modal-content shadow-xl rounded-lg bg-white px-4 pt-5 pb-4 text-left overflow-hidden transform transition-all sm:my-72 sm:max-w-sm sm:w-full sm:p-6 ">
         <%= live_patch raw("&times;"), to: @return_to, class: "phx-modal-close" %>
-        <%= live_component @socket, @component, @opts %>
+        <%= live_component @component, @opts %>
       </div>
     </div>
 

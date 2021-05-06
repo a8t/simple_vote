@@ -9,16 +9,16 @@ defmodule SimpleVoteWeb.LiveHelpers do
 
   ## Examples
 
-      <%= live_modal @socket, SimpleVoteWeb.PromptLive.FormComponent,
+      <%= live_modal SimpleVoteWeb.PromptLive.FormComponent,
         id: @prompt.id || :new,
         action: @live_action,
         prompt: @prompt,
-        return_to: Routes.prompt_index_path(@socket, :index) %>
+        return_to: Routes.prompt_index_path(:index) %>
   """
-  def live_modal(_socket, component, opts) do
+  def live_modal(component, opts) do
     path = Keyword.fetch!(opts, :return_to)
     modal_opts = [id: :modal, return_to: path, component: component, opts: opts]
-    live_component(socket, SimpleVoteWeb.ModalComponent, modal_opts)
+    live_component(SimpleVoteWeb.ModalComponent, modal_opts)
   end
 
   def assign_user(%{"user_token" => user_token}, socket) do

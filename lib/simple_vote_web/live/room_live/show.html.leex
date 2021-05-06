@@ -1,5 +1,5 @@
 <%= if @live_action in [:edit] do %>
-  <%= live_modal @socket, SimpleVoteWeb.RoomLive.RoomFormComponent,
+  <%= live_modal SimpleVoteWeb.RoomLive.RoomFormComponent,
     id: @room.id,
     title: @page_title,
     action: @live_action,
@@ -8,7 +8,7 @@
 <% end %>
 
 <%= if @live_action in [:new_prompt, :edit_prompt] do %>
-  <%= live_modal @socket, SimpleVoteWeb.PromptLive.PromptFormComponent,
+  <%= live_modal SimpleVoteWeb.PromptLive.PromptFormComponent,
     id: @prompt.id || :new,
     title: @page_title,
     action: @live_action,
@@ -18,7 +18,7 @@
 <% end %>
 
 <%= if @live_action in [:new_option, :edit_option] do %>
-  <%= live_modal @socket, SimpleVoteWeb.PromptLive.OptionFormComponent,
+  <%= live_modal SimpleVoteWeb.PromptLive.OptionFormComponent,
     id: @option.id || :new,
     title: @page_title,
     action: @live_action,
@@ -89,7 +89,7 @@
             </div>
 
             <div class="flex-grow">
-              <%= live_component @socket, SimpleVoteWeb.PromptComponent, room: @room, prompt: prompt %>
+              <%= live_component SimpleVoteWeb.PromptComponent, room: @room, prompt: prompt %>
             </div>
           </li>
         <% end %>

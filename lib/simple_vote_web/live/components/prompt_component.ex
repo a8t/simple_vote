@@ -1,6 +1,5 @@
 defmodule SimpleVoteWeb.PromptComponent do
   use SimpleVoteWeb, :live_component
-  alias SimpleVote.Polls
 
   @impl true
   def render(assigns) do
@@ -41,7 +40,7 @@ defmodule SimpleVoteWeb.PromptComponent do
           <ul class="flex flex-col space-y-2 mt-2">
             <%= for option <- @prompt.options do %>
               <li class="flex items-center relative rounded-lg border border-gray-300 bg-white shadow-sm px-6 py-4 hover:border-gray-400 sm:flex sm:justify-between focus-within:ring-1 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                <%= live_component @socket, SimpleVoteWeb.OptionComponent, room: @room, prompt: @prompt, option: option, id: option.id %>
+                <%= live_component SimpleVoteWeb.OptionComponent, room: @room, prompt: @prompt, option: option, id: option.id %>
               </li>
             <% end %>
           </ul>

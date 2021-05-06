@@ -1,7 +1,7 @@
 <h1>Listing Rooms</h1>
 
 <%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket, SimpleVoteWeb.RoomLive.RoomFormComponent,
+  <%= live_modal SimpleVoteWeb.RoomLive.RoomFormComponent,
     id: @room.id || :new,
     title: @page_title,
     action: @live_action,

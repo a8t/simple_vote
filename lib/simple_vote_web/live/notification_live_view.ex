@@ -4,7 +4,7 @@ defmodule SimpleVoteWeb.LiveNotification do
   @impl true
   def render(assigns) do
     ~L"""
-      <%= live_component(@socket, SimpleVoteWeb.NotificationComponent, flash: assigns.flash) %>
+      <%= live_component(SimpleVoteWeb.NotificationComponent, flash: assigns.flash) %>
     """
   end
 end
@@ -28,7 +28,7 @@ defmodule SimpleVoteWeb.NotificationComponent do
           <div class="p-4">
             <div class="flex items-start">
               <div class="flex-shrink-0">
-                <%= live_component(@socket, icon) %>
+                <%= live_component(icon) %>
               </div>
               <div class="ml-3 w-0 flex-1 pt-0.5">
                 <p class="text-sm font-medium text-gray-900">
