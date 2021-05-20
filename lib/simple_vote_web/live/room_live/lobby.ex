@@ -1,51 +1,66 @@
-defmodule SimpleVoteWeb.RoomLive.Vote.NameForm do
+defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
   use SimpleVoteWeb, :surface_component
 
   alias Surface.Components.Form
-  alias Surface.Components.Form.{Field, Label, TextInput}
+  alias Surface.Components.Form.{Field, Label, TextInput, HiddenInput, ErrorTag}
 
-  data name, :string, default: ""
+  prop return, :string
+  data nickname, :string, default: ""
+  data trigger_submit, :boolean, default: false
+  data errors, :list, default: []
 
   def render(assigns) do
-    """
-      <Form for={{ @socket }} change="change" opts={{ autocomplete: "off" }}>
-      <Field name="name">
-      <Label/>
-        <div class="control">
-          <TextInput value={{ @name }}/>
-        </div>
+    ~H"""
+    <Form
+      for={{ :nickname_form }}
+      submit="save"
+      change="change"
+      action={{Routes.nickname_path(@socket, :create)}}
+      opts={{
+        id: "lobby-form",
+        autocomplete: "off",
+        phx_trigger_action: @trigger_submit
+      }}
+      as={{:nickname_form}}
+      errors={{@errors}}
+    >
+      <Field name="return_to">
+        <HiddenInput value={{@return}} name="return_to" field="return_to"  form="nickname_form"/>
       </Field>
-
+      <Field name="nickname">
+        <Label/>
+        <TextInput form="nickname_form" value={{@nickname}}/>
+        <ErrorTag field="nickname"/>
+      </Field>
     </Form>
     """
+  end
 
-    ~H"""
-    Register now!
+  def handle_event("save", %{"nickname_form" => %{"nickname" => nickname}}, socket) do
+    # check if there is anyone else with that name already
+    {:noreply, assign(socket, trigger_submit: true)}
+  end
 
-    """
+  def handle_event("change", %{"nickname_form" => %{"nickname" => nickname}}, socket) do
+    case nickname do
+      "" -> {:noreply, assign(socket, errors: [nickname: {"Cannot be blank", []}])}
+      _ -> {:noreply, assign(socket, nickname: nickname, errors: [])}
+    end
   end
 end
 
 defmodule SimpleVoteWeb.RoomLive.Lobby do
   use SimpleVoteWeb, :surface_view
 
-  import Logger
-
   alias SimpleVote.Rooms
   alias SimpleVote.Rooms.RoomRegistry
-  alias SimpleVote.Accounts.User
   alias SimpleVoteWeb.Presence
-
-  defp get_username(socket) do
-    case Map.get(socket.assigns, "username") do
-      nil -> {:error, :no_username}
-      username -> {:ok, username}
-    end
-  end
 
   @impl true
   @spec mount(map, any, Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
-  def mount(%{"slug" => slug}, _session, socket) do
+  def mount(%{"slug" => slug}, session, socket) do
+    socket = assign_user(session, socket)
+
     with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
          room = %Rooms.Room{} <- Rooms.get_room!(room_id),
          {:ok, present} = join_room(socket, slug) do
@@ -53,6 +68,7 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
         socket
         |> assign(:present, present)
         |> assign(:room, room)
+        |> assign(:slug, slug)
 
       {:ok, socket}
     else
@@ -71,14 +87,38 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
 
   @impl true
   def render(assigns) do
-    ~H"""
-    Vote: {{@room.name}}
-    Present: {{@present}}
-        Register now!
-      <div :for={{ prompt <- @room.prompts }}>
-        <SimpleVoteWeb.RoomLive.Vote.Prompt body={{prompt.body}} options={{prompt.options}} />
+    nickname = Map.get(assigns, :nickname, nil)
+
+    if nickname do
+      ~H"""
+      <div>
+        {{@room.name}}
       </div>
-    """
+      <div>
+        Present: {{@present}}
+      </div>
+      <div>
+        Nickname: {{nickname}}
+      </div>
+
+      Lobby
+        <div :for={{ prompt <- @room.prompts }}>
+          <SimpleVoteWeb.RoomLive.Vote.Prompt body={{prompt.body}} options={{prompt.options}} />
+        </div>
+      """
+    else
+      ~H"""
+      <div>
+        {{@room.name}}
+      </div>
+      <div>
+        Present: {{@present}}
+      </div>
+
+        Register now!
+        <SimpleVoteWeb.RoomLive.Lobby.NameForm id="lobby-form" return={{Routes.room_lobby_path(@socket, :show, @room)}}/>
+      """
+    end
   end
 
   defp join_room(socket, slug) do

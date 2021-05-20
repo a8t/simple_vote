@@ -42,9 +42,9 @@ defmodule SimpleVoteWeb.RoomLive.Vote.Prompt do
         <legend class="sr-only">
           Prompts
         </legend>
-        <li :for={{ option <- @options }}>
+        <div :for={{ option <- @options }}>
           <SimpleVoteWeb.RoomLive.Vote.Option body={{option.body}}/>
-        </li>
+        </div>
       </fieldset>
     """
   end

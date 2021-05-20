@@ -58,5 +58,32 @@ defmodule SimpleVoteWeb.VoteLiveTest do
 
       assert html =~ "Register now!"
     end
+
+    test "submiting form triggers POST submission form", %{conn: conn, room: room} do
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      show_live
+      |> form("#lobby-form")
+      |> render_submit()
+
+      conn =
+        show_live
+        |> form("#lobby-form",
+          nickname_form: %{
+            nickname: "hello"
+          },
+          return_to: Routes.room_lobby_path(conn, :show, room)
+        )
+        |> follow_trigger_action(conn)
+
+      assert get_session(conn, :nickname) == "hello"
+
+      # make sure the form is gone now
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      refute show_live
+             |> has_element?("#lobby-form")
+             |> IO.inspect()
+    end
   end
 end
