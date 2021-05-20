@@ -59,6 +59,28 @@ defmodule SimpleVoteWeb.VoteLiveTest do
       assert html =~ "Register now!"
     end
 
+    test "form shows validation errors correctly", %{conn: conn, room: room} do
+      {:ok, show_live, html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      refute html =~ "Cannot be blank"
+
+      refute show_live
+             |> form("#lobby-form")
+             |> render_change(
+               nickname_form: %{
+                 nickname: "hello"
+               }
+             ) =~ "Cannot be blank"
+
+      assert show_live
+             |> form("#lobby-form")
+             |> render_change(
+               nickname_form: %{
+                 nickname: ""
+               }
+             ) =~ "Cannot be blank"
+    end
+
     test "submiting form triggers POST submission form", %{conn: conn, room: room} do
       {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
 
@@ -83,7 +105,6 @@ defmodule SimpleVoteWeb.VoteLiveTest do
 
       refute show_live
              |> has_element?("#lobby-form")
-             |> IO.inspect()
     end
   end
 end
