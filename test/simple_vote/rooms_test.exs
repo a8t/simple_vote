@@ -95,4 +95,57 @@ defmodule SimpleVote.RoomsTest do
       assert {:error, :no_room_with_slug} = RoomRegistry.get_room_id("bad slug")
     end
   end
+
+  describe "nickname registry" do
+    alias SimpleVote.Rooms.RoomRegistry
+    alias SimpleVote.Rooms.NicknameRegistry
+
+    setup do
+      room_id = :rand.uniform(9999)
+      room_slug = RoomRegistry.get_room_slug(room_id)
+
+      %{room_id: room_id, room_slug: room_slug}
+    end
+
+    test "register/1 - registers nickname to room that exists", %{room_slug: room_slug} do
+      assert {:ok, "nickname"} = NicknameRegistry.register(room_slug, "nickname")
+    end
+
+    test "register/1 - allows multiple registration to the same room", %{room_slug: room_slug} do
+      assert {:ok, "nickname"} = NicknameRegistry.register(room_slug, "nickname")
+      assert {:ok, "nickname2"} = NicknameRegistry.register(room_slug, "nickname2")
+    end
+
+    test "register/1 - errors if nickname already registered", %{room_slug: room_slug} do
+      NicknameRegistry.register(room_slug, "nickname")
+
+      assert {:error, :nickname_already_registered} =
+               NicknameRegistry.register(room_slug, "nickname")
+    end
+
+    test "list/1 - lists nicknames registered in a room", %{room_slug: room_slug} do
+      {:ok, _} = NicknameRegistry.register(room_slug, "andy")
+      {:ok, _} = NicknameRegistry.register(room_slug, "fatima")
+
+      assert {:ok,
+              [
+                {{^room_slug, "andy"}, %{nickname: "andy"}},
+                {{^room_slug, "fatima"}, %{nickname: "fatima"}}
+              ]} = NicknameRegistry.list(room_slug)
+    end
+
+    test "list/1 - returns empty list for empty room", %{room_slug: room_slug} do
+      assert {:ok, []} = NicknameRegistry.list(room_slug)
+    end
+
+    test "list/1 - returns empty list even if room dne", %{room_slug: _room_slug} do
+      assert {:ok, []} = NicknameRegistry.list("hello")
+    end
+
+    test "unregister/1 - unregisters from a room", %{room_slug: room_slug} do
+      {:ok, _} = NicknameRegistry.register(room_slug, "andy")
+      assert :ok = NicknameRegistry.unregister(room_slug, "andy")
+      assert {:ok, []} = NicknameRegistry.list(room_slug)
+    end
+  end
 end

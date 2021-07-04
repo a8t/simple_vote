@@ -89,6 +89,7 @@ defmodule SimpleVoteWeb.Router do
     delete "/users/log_out", UserSessionController, :delete
     get "/users/confirm", UserConfirmationController, :new
     post "/users/confirm", UserConfirmationController, :create
+    post "/nickname", NicknameController, :create
     get "/users/confirm/:token", UserConfirmationController, :confirm
   end
 end

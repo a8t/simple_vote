@@ -21,9 +21,20 @@ defmodule SimpleVoteWeb.LiveHelpers do
     live_component(SimpleVoteWeb.ModalComponent, modal_opts)
   end
 
-  def assign_user(%{"user_token" => user_token}, socket) do
-    Phoenix.LiveView.assign_new(socket, :current_user, fn ->
+  def assign_user(%{"user_token" => user_token} = session, socket) do
+    socket
+    |> Phoenix.LiveView.assign_new(:current_user, fn ->
       SimpleVote.Accounts.get_user_by_session_token(user_token)
+    end)
+    |> Phoenix.LiveView.assign_new(:nickname, fn ->
+      Map.get(session, "nickname", "none")
+    end)
+  end
+
+  def assign_user(%{"nickname" => nickname}, socket) do
+    socket
+    |> Phoenix.LiveView.assign_new(:nickname, fn ->
+      nickname
     end)
   end
 
