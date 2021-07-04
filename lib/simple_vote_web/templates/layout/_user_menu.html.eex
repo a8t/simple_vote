@@ -1,6 +1,7 @@
 <ul class="flex text-indigo-50 space-x-8 mr-4">
   <%= if @current_user do %>
-    <!-- <li><%= @current_user.email %></li> -->
+    <li><%= @current_user.email %></li>
+    <li><%= link "Rooms", to: Routes.room_index_path(@conn, :index), class: "hover:text-indigo-300" %></li>
     <li><%= link "Settings", to: Routes.user_settings_path(@conn, :edit), class: "hover:text-indigo-300" %></li>
     <li><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete, class: "hover:text-indigo-300" %></li>
   <% else %>
