@@ -3,8 +3,10 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
 
   alias Surface.Components.Form
   alias Surface.Components.Form.{Field, Label, TextInput, HiddenInput, ErrorTag}
+  alias SimpleVote.Rooms.NicknameRegistry
 
   prop return, :string
+  prop room_slug, :string
   data nickname, :string, default: ""
   data trigger_submit, :boolean, default: false
   data errors, :list, default: []
@@ -27,6 +29,9 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
       <Field name="return_to">
         <HiddenInput value={{@return}} name="return_to" field="return_to"  form="nickname_form"/>
       </Field>
+      <Field name="room_slug">
+        <HiddenInput value={{@room_slug}} name="room_slug" field="room_slug"  form="nickname_form"/>
+      </Field>
       <Field name="nickname">
         <Label/>
         <TextInput form="nickname_form" value={{@nickname}}/>
@@ -36,9 +41,25 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
     """
   end
 
-  def handle_event("save", %{"nickname_form" => %{"nickname" => nickname}}, socket) do
+  def handle_event(
+        "save",
+        %{"nickname_form" => %{"nickname" => nickname}, "room_slug" => room_slug},
+        socket
+      ) do
     # check if there is anyone else with that name already
-    {:noreply, assign(socket, trigger_submit: true)}
+
+    if socket.assigns.trigger_submit do
+      send(self(), {:changed_nickname, nickname})
+    else
+      case NicknameRegistry.register(room_slug, nickname) do
+        {:ok, _nickname} ->
+          {:noreply, assign(socket, trigger_submit: true)}
+
+        _ ->
+          {:noreply,
+           assign(socket, errors: [nickname: {"Someone already has this nickname!", []}])}
+      end
+    end
   end
 
   def handle_event("change", %{"nickname_form" => %{"nickname" => nickname}}, socket) do
@@ -59,7 +80,9 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
   @impl true
   @spec mount(map, any, Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(%{"slug" => slug}, session, socket) do
-    socket = assign_user(session, socket)
+    socket =
+      assign_user(session, socket)
+      |> assign(:slug, slug)
 
     with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
          room = %Rooms.Room{} <- Rooms.get_room!(room_id),
@@ -68,7 +91,6 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
         socket
         |> assign(:present, present)
         |> assign(:room, room)
-        |> assign(:slug, slug)
 
       {:ok, socket}
     else
@@ -116,7 +138,7 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
       </div>
 
         Register now!
-        <SimpleVoteWeb.RoomLive.Lobby.NameForm id="lobby-form" return={{Routes.room_lobby_path(@socket, :show, @room)}}/>
+        <SimpleVoteWeb.RoomLive.Lobby.NameForm id="lobby-form" return={{Routes.room_lobby_path(@socket, :show, @room)}} room_slug={{@slug}}/>
       """
     end
   end
