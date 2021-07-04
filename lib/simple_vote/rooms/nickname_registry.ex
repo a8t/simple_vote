@@ -17,6 +17,13 @@ defmodule SimpleVote.Rooms.NicknameRegistry do
     end
   end
 
+  def unregister(room_slug, nickname) do
+    _unregistered =
+      GenServer.call(__MODULE__, {:unregister_nickname_from_room, room_slug, nickname})
+
+    :ok
+  end
+
   def list(room_slug) do
     {:ok, :ets.match_object(@table, {{room_slug, :_}, :_})}
   end
@@ -37,5 +44,11 @@ defmodule SimpleVote.Rooms.NicknameRegistry do
     new_inserted = :ets.insert_new(@table, {{room_slug, nickname}, %{nickname: nickname}})
 
     {:reply, new_inserted, state}
+  end
+
+  def handle_call({:unregister_nickname_from_room, room_slug, nickname}, _from, state) do
+    deleted = :ets.delete(@table, {room_slug, nickname})
+
+    {:reply, deleted, state}
   end
 end

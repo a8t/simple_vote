@@ -141,5 +141,11 @@ defmodule SimpleVote.RoomsTest do
     test "list/1 - returns empty list even if room dne", %{room_slug: _room_slug} do
       assert {:ok, []} = NicknameRegistry.list("hello")
     end
+
+    test "unregister/1 - unregisters from a room", %{room_slug: room_slug} do
+      {:ok, _} = NicknameRegistry.register(room_slug, "andy")
+      assert :ok = NicknameRegistry.unregister(room_slug, "andy")
+      assert {:ok, []} = NicknameRegistry.list(room_slug)
+    end
   end
 end
