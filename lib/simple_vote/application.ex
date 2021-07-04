@@ -17,6 +17,7 @@ defmodule SimpleVote.Application do
       SimpleVoteWeb.Endpoint,
       # Start a worker by calling: SimpleVote.Worker.start_link(arg)
       {SimpleVote.Rooms.RoomRegistry, nil},
+      {SimpleVote.Rooms.NicknameRegistry, nil},
       SimpleVoteWeb.Presence
     ]
 
