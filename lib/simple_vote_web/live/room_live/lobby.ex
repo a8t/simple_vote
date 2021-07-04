@@ -113,32 +113,38 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
 
     if nickname do
       ~H"""
-      <div>
-        {{@room.name}}
-      </div>
-      <div>
-        Present: {{@present}}
-      </div>
-      <div>
-        Nickname: {{nickname}}
-      </div>
+      <div class="max-w-3xl mx-auto">
+        <div>
+          {{@room.name}}
+        </div>
+        <div>
+          Present: {{@present}}
+        </div>
+        <div>
+          Nickname: {{nickname}}
+        </div>
 
-      Lobby
+        Lobby
         <div :for={{ prompt <- @room.prompts }}>
           <SimpleVoteWeb.RoomLive.Vote.Prompt body={{prompt.body}} options={{prompt.options}} />
         </div>
+
+      </div>
+
       """
     else
       ~H"""
-      <div>
-        {{@room.name}}
-      </div>
-      <div>
-        Present: {{@present}}
-      </div>
+        <div class="max-w-3xl mx-auto">
+          <div>
+            {{@room.name}}
+          </div>
+          <div>
+            Present: {{@present}}
+          </div>
 
-        Register now!
-        <SimpleVoteWeb.RoomLive.Lobby.NameForm id="lobby-form" return={{Routes.room_lobby_path(@socket, :show, @room)}} room_slug={{@slug}}/>
+          Register now!
+          <SimpleVoteWeb.RoomLive.Lobby.NameForm id="lobby-form" return={{Routes.room_lobby_path(@socket, :show, @room)}} room_slug={{@slug}}/>
+        </div>
       """
     end
   end
