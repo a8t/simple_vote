@@ -75,6 +75,7 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
 
   alias SimpleVote.Rooms
   alias SimpleVote.Rooms.RoomRegistry
+  alias SimpleVote.Rooms.NicknameRegistry
   alias SimpleVoteWeb.Presence
 
   @impl true
@@ -87,6 +88,12 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
     with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
          room = %Rooms.Room{} <- Rooms.get_room!(room_id),
          {:ok, present} = join_room(socket, slug) do
+      nickname = Map.get(session, "nickname", nil)
+
+      if nickname do
+        NicknameRegistry.register(slug, nickname)
+      end
+
       socket =
         socket
         |> assign(:present, present)

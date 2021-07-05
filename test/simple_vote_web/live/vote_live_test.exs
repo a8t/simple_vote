@@ -107,6 +107,16 @@ defmodule SimpleVoteWeb.VoteLiveTest do
              |> has_element?("#lobby-form")
     end
 
+    test "registers nickname in room if exists in session", %{conn: conn, room: room} do
+      conn = Plug.Test.init_test_session(conn, nickname: "hello")
+
+      room_slug = SimpleVote.Rooms.RoomRegistry.get_room_slug(room.id)
+      {:ok, []} = SimpleVote.Rooms.NicknameRegistry.list(room_slug)
+
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+      refute {:ok, []} == SimpleVote.Rooms.NicknameRegistry.list(room_slug)
+    end
+
     test "form shows validation errors when duplicate name", %{conn: conn, room: room} do
       # setup! make a conn with nickname
       {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
