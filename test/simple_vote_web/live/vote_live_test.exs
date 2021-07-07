@@ -81,11 +81,18 @@ defmodule SimpleVoteWeb.VoteLiveTest do
              ) =~ "Cannot be blank"
     end
 
-    test "submiting form triggers POST submission form", %{conn: conn, room: room} do
+    test "registering nickname works! submiting form triggers POST submission form", %{
+      conn: conn,
+      room: room
+    } do
       {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
 
       show_live
-      |> form("#lobby-form")
+      |> form("#lobby-form",
+        nickname_form: %{
+          nickname: "hello"
+        }
+      )
       |> render_submit()
 
       conn =
@@ -113,7 +120,7 @@ defmodule SimpleVoteWeb.VoteLiveTest do
       room_slug = SimpleVote.Rooms.RoomRegistry.get_room_slug(room.id)
       {:ok, []} = SimpleVote.Rooms.NicknameRegistry.list(room_slug)
 
-      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+      {:ok, _show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
       refute {:ok, []} == SimpleVote.Rooms.NicknameRegistry.list(room_slug)
     end
 
@@ -164,6 +171,23 @@ defmodule SimpleVoteWeb.VoteLiveTest do
              |> form("#lobby-form",
                nickname_form: %{
                  nickname: ""
+               }
+             )
+             |> render_submit() =~
+               "Nickname cannot be empty!"
+    end
+
+    test "form shows validation errors when submitting whitespace nickname", %{
+      conn: conn,
+      room: room
+    } do
+      # setup! make a conn with nickname
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      assert show_live
+             |> form("#lobby-form",
+               nickname_form: %{
+                 nickname: " "
                }
              )
              |> render_submit() =~

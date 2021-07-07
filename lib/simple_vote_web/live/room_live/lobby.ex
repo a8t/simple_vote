@@ -43,7 +43,7 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
 
   def handle_event("save", value, %{assigns: %{trigger_submit: trigger_submit}} = socket)
       when trigger_submit == false do
-    nickname = value["nickname_form"]["nickname"]
+    nickname = String.trim(value["nickname_form"]["nickname"])
     room_slug = value["room_slug"]
 
     with {:ok, _nickname} <- NicknameRegistry.register(room_slug, nickname) do
@@ -59,7 +59,7 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
 
   def handle_event("save", value, %{assigns: %{trigger_submit: trigger_submit}})
       when trigger_submit == true do
-    send(self(), {:changed_nickname, value["nickname_form"]["nickname"]})
+    send(self(), {:changed_nickname, String.trim(value["nickname_form"]["nickname"])})
   end
 
   def handle_event("change", %{"nickname_form" => %{"nickname" => nickname}}, socket) do
