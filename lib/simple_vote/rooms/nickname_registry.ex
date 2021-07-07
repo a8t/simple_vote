@@ -8,6 +8,10 @@ defmodule SimpleVote.Rooms.NicknameRegistry do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
+  def register(_room_slug, "") do
+    {:error, :nickname_empty}
+  end
+
   def register(room_slug, nickname) do
     inserted_new = GenServer.call(__MODULE__, {:register_nickname_to_room, room_slug, nickname})
 

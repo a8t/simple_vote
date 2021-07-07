@@ -155,5 +155,19 @@ defmodule SimpleVoteWeb.VoteLiveTest do
              |> render_submit() =~
                "Someone already has this nickname!"
     end
+
+    test "form shows validation errors when submitting empty nickname", %{conn: conn, room: room} do
+      # setup! make a conn with nickname
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      assert show_live
+             |> form("#lobby-form",
+               nickname_form: %{
+                 nickname: ""
+               }
+             )
+             |> render_submit() =~
+               "Nickname cannot be empty!"
+    end
   end
 end

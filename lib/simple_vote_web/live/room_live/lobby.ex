@@ -27,39 +27,39 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
       errors={@errors}
     >
       <Field name="return_to">
-        <HiddenInput value={@return} name="return_to" field="return_to"  form="nickname_form"/>
+        <HiddenInput value={@return} name="return_to" field="return_to"  form={:nickname_form}/>
       </Field>
       <Field name="room_slug">
-        <HiddenInput value={@room_slug} name="room_slug" field="room_slug"  form="nickname_form"/>
+        <HiddenInput value={@room_slug} name="room_slug" field="room_slug"  form={:nickname_form}/>
       </Field>
       <Field name="nickname">
         <Label/>
-        <TextInput form="nickname_form" value={@nickname}/>
+        <TextInput form={:nickname_form} value={@nickname}/>
         <ErrorTag field={:nickname}/>
       </Field>
     </Form>
     """
   end
 
-  def handle_event(
-        "save",
-        %{"nickname_form" => %{"nickname" => nickname}, "room_slug" => room_slug},
-        socket
-      ) do
-    # check if there is anyone else with that name already
+  def handle_event("save", value, %{assigns: %{trigger_submit: trigger_submit}} = socket)
+      when trigger_submit == false do
+    nickname = value["nickname_form"]["nickname"]
+    room_slug = value["room_slug"]
 
-    if socket.assigns.trigger_submit do
-      send(self(), {:changed_nickname, nickname})
+    with {:ok, _nickname} <- NicknameRegistry.register(room_slug, nickname) do
+      {:noreply, assign(socket, trigger_submit: true)}
     else
-      case NicknameRegistry.register(room_slug, nickname) do
-        {:ok, _nickname} ->
-          {:noreply, assign(socket, trigger_submit: true)}
+      {:error, :nickname_already_registered} ->
+        {:noreply, assign(socket, errors: [nickname: {"Someone already has this nickname!", []}])}
 
-        _ ->
-          {:noreply,
-           assign(socket, errors: [nickname: {"Someone already has this nickname!", []}])}
-      end
+      {:error, :nickname_empty} ->
+        {:noreply, assign(socket, errors: [nickname: {"Nickname cannot be empty!", []}])}
     end
+  end
+
+  def handle_event("save", value, %{assigns: %{trigger_submit: trigger_submit}})
+      when trigger_submit == true do
+    send(self(), {:changed_nickname, value["nickname_form"]["nickname"]})
   end
 
   def handle_event("change", %{"nickname_form" => %{"nickname" => nickname}}, socket) do
