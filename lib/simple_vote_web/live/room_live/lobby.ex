@@ -12,30 +12,30 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
   data errors, :list, default: []
 
   def render(assigns) do
-    ~H"""
+    ~F"""
     <Form
-      for={{ :nickname_form }}
+      for={ :nickname_form }
       submit="save"
       change="change"
-      action={{Routes.nickname_path(@socket, :create)}}
-      opts={{
+      action={Routes.nickname_path(@socket, :create)}
+      opts={
         id: "lobby-form",
         autocomplete: "off",
         phx_trigger_action: @trigger_submit
-      }}
-      as={{:nickname_form}}
-      errors={{@errors}}
+      }
+      as={:nickname_form}
+      errors={@errors}
     >
       <Field name="return_to">
-        <HiddenInput value={{@return}} name="return_to" field="return_to"  form="nickname_form"/>
+        <HiddenInput value={@return} name="return_to" field="return_to"  form="nickname_form"/>
       </Field>
       <Field name="room_slug">
-        <HiddenInput value={{@room_slug}} name="room_slug" field="room_slug"  form="nickname_form"/>
+        <HiddenInput value={@room_slug} name="room_slug" field="room_slug"  form="nickname_form"/>
       </Field>
       <Field name="nickname">
         <Label/>
-        <TextInput form="nickname_form" value={{@nickname}}/>
-        <ErrorTag field="nickname"/>
+        <TextInput form="nickname_form" value={@nickname}/>
+        <ErrorTag field={:nickname}/>
       </Field>
     </Form>
     """
@@ -119,38 +119,38 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
     nickname = Map.get(assigns, :nickname, nil)
 
     if nickname do
-      ~H"""
+      ~F"""
       <div class="max-w-3xl mx-auto">
         <div>
-          {{@room.name}}
+          {@room.name}
         </div>
         <div>
-          Present: {{@present}}
+          Present: {@present}
         </div>
         <div>
-          Nickname: {{nickname}}
+          Nickname: {nickname}
         </div>
 
         Lobby
-        <div :for={{ prompt <- @room.prompts }}>
-          <SimpleVoteWeb.RoomLive.Vote.Prompt body={{prompt.body}} options={{prompt.options}} />
+        <div :for={ prompt <- @room.prompts }>
+          <SimpleVoteWeb.RoomLive.Vote.Prompt body={prompt.body} options={prompt.options} />
         </div>
 
       </div>
 
       """
     else
-      ~H"""
+      ~F"""
         <div class="max-w-3xl mx-auto">
           <div>
-            {{@room.name}}
+            {@room.name}
           </div>
           <div>
-            Present: {{@present}}
+            Present: {@present}
           </div>
 
           Register now!
-          <SimpleVoteWeb.RoomLive.Lobby.NameForm id="lobby-form" return={{Routes.room_lobby_path(@socket, :show, @room)}} room_slug={{@slug}}/>
+          <SimpleVoteWeb.RoomLive.Lobby.NameForm id="lobby-form" return={Routes.room_lobby_path(@socket, :show, @room)} room_slug={@slug}/>
         </div>
       """
     end
