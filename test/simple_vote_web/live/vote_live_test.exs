@@ -114,6 +114,67 @@ defmodule SimpleVoteWeb.VoteLiveTest do
              |> has_element?("#lobby-form")
     end
 
+    test "displays all registered people", %{
+      conn: conn,
+      room: room
+    } do
+      # first person registers
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      show_live
+      |> form("#lobby-form",
+        nickname_form: %{
+          nickname: "nickname1"
+        }
+      )
+      |> render_submit()
+
+      triggered_conn =
+        show_live
+        |> form("#lobby-form",
+          nickname_form: %{
+            nickname: "nickname1"
+          },
+          return_to: Routes.room_lobby_path(conn, :show, room)
+        )
+        |> follow_trigger_action(conn)
+
+      # second person registers
+
+      another_conn = build_conn()
+
+      {:ok, second_show_live, _html} =
+        live(another_conn, Routes.room_lobby_path(another_conn, :show, room))
+
+      second_show_live
+      |> form("#lobby-form",
+        nickname_form: %{
+          nickname: "hello2"
+        }
+      )
+      |> render_submit()
+
+      second_show_live
+      |> form("#lobby-form",
+        nickname_form: %{
+          nickname: "hello2"
+        },
+        return_to: Routes.room_lobby_path(another_conn, :show, room)
+      )
+      |> follow_trigger_action(another_conn)
+
+      third_conn = build_conn()
+
+      {:ok, _third_show_live, html} =
+        live(third_conn, Routes.room_lobby_path(third_conn, :show, room))
+
+      ["", _, slug, "lobby"] =
+        Routes.room_lobby_path(third_conn, :show, room) |> String.split("/")
+
+      assert html =~ "hello2"
+      assert html =~ "nickname1"
+    end
+
     test "registers nickname in room if exists in session", %{conn: conn, room: room} do
       conn = Plug.Test.init_test_session(conn, nickname: "hello")
 

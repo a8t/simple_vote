@@ -81,9 +81,15 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
   @impl true
   @spec mount(map, any, Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(%{"slug" => slug}, session, socket) do
+    {:ok, current_users} = NicknameRegistry.list(slug)
+
     socket =
       assign_user(session, socket)
       |> assign(:slug, slug)
+      |> assign(
+        :current_users,
+        current_users |> Enum.map(fn {{_slug, name}, _details} -> name end)
+      )
 
     with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
          room = %Rooms.Room{} <- Rooms.get_room!(room_id),
@@ -126,6 +132,10 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
         </div>
         <div>
           Present: {@present}
+
+          <div :for={ user <- @current_users }>
+            {user}
+          </div>
         </div>
         <div>
           Nickname: {nickname}
@@ -147,6 +157,10 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
           </div>
           <div>
             Present: {@present}
+
+            <div :for={ user <- @current_users }>
+              {user}
+            </div>
           </div>
 
           Register now!
