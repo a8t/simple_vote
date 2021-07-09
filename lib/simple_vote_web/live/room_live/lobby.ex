@@ -41,8 +41,7 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
     """
   end
 
-  def handle_event("save", value, %{assigns: %{trigger_submit: trigger_submit}} = socket)
-      when trigger_submit == false do
+  def handle_event("save", value, %{assigns: %{trigger_submit: trigger_submit}} = socket) do
     nickname = String.trim(value["nickname_form"]["nickname"])
     room_slug = value["room_slug"]
 
@@ -55,11 +54,6 @@ defmodule SimpleVoteWeb.RoomLive.Lobby.NameForm do
       {:error, :nickname_empty} ->
         {:noreply, assign(socket, errors: [nickname: {"Nickname cannot be empty!", []}])}
     end
-  end
-
-  def handle_event("save", value, %{assigns: %{trigger_submit: trigger_submit}})
-      when trigger_submit == true do
-    send(self(), {:changed_nickname, String.trim(value["nickname_form"]["nickname"])})
   end
 
   def handle_event("change", %{"nickname_form" => %{"nickname" => nickname}}, socket) do
@@ -81,15 +75,10 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
   @impl true
   @spec mount(map, any, Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(%{"slug" => slug}, session, socket) do
-    {:ok, current_users} = NicknameRegistry.list(slug)
-
     socket =
       assign_user(session, socket)
       |> assign(:slug, slug)
-      |> assign(
-        :current_users,
-        current_users |> Enum.map(fn {{_slug, name}, _details} -> name end)
-      )
+      |> assign(:other_users, get_other_users(slug, socket.id))
 
     with {:ok, room_id} <- RoomRegistry.get_room_id(slug),
          room = %Rooms.Room{} <- Rooms.get_room!(room_id),
@@ -98,6 +87,8 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
 
       if nickname do
         NicknameRegistry.register(slug, nickname)
+
+        update_nickname_presence(socket, nickname)
       end
 
       socket =
@@ -123,6 +114,8 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
   @impl true
   def render(assigns) do
     nickname = Map.get(assigns, :nickname, nil)
+    other_users = Map.get(assigns, :other_users, [])
+    others = Enum.join(other_users, ", ")
 
     if nickname do
       ~F"""
@@ -132,10 +125,10 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
         </div>
         <div>
           Present: {@present}
+        </div>
+        <div>
 
-          <div :for={ user <- @current_users }>
-            {user}
-          </div>
+        Others: {others}
         </div>
         <div>
           Nickname: {nickname}
@@ -157,10 +150,10 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
           </div>
           <div>
             Present: {@present}
+          </div>
 
-            <div :for={ user <- @current_users }>
-              {user}
-            </div>
+          <div>
+            Others: {others}
           </div>
 
           Register now!
@@ -171,7 +164,7 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
   end
 
   defp join_room(socket, slug) do
-    topic = "lobby:#{slug}"
+    topic = "room:#{slug}"
 
     # before subscribing, let's get the current_reader_count
     initial_count =
@@ -188,6 +181,21 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
     {:ok, initial_count}
   end
 
+  defp get_other_users(slug, socket_id) do
+    topic = "room:#{slug}"
+
+    for {id, %{metas: metas}} <- Presence.list(topic),
+        socket_id != id,
+        into: [],
+        do: metas |> hd() |> Map.get(:nickname)
+  end
+
+  defp update_nickname_presence(socket, nickname) do
+    slug = socket.assigns.slug
+    topic = "room:#{slug}"
+    Presence.update(self(), topic, socket.id, %{nickname: nickname})
+  end
+
   @impl true
   def handle_info(
         %{event: "presence_diff", payload: %{joins: joins, leaves: leaves}},
@@ -195,6 +203,11 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
       ) do
     present = count + map_size(joins) - map_size(leaves)
 
-    {:noreply, assign(socket, :present, present)}
+    socket =
+      socket
+      |> assign(:present, present)
+      |> assign(:other_users, get_other_users(socket.assigns.slug, socket.id))
+
+    {:noreply, socket}
   end
 end

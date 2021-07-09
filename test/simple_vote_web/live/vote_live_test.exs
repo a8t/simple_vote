@@ -114,67 +114,6 @@ defmodule SimpleVoteWeb.VoteLiveTest do
              |> has_element?("#lobby-form")
     end
 
-    test "displays all registered people", %{
-      conn: conn,
-      room: room
-    } do
-      # first person registers
-      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
-
-      show_live
-      |> form("#lobby-form",
-        nickname_form: %{
-          nickname: "nickname1"
-        }
-      )
-      |> render_submit()
-
-      triggered_conn =
-        show_live
-        |> form("#lobby-form",
-          nickname_form: %{
-            nickname: "nickname1"
-          },
-          return_to: Routes.room_lobby_path(conn, :show, room)
-        )
-        |> follow_trigger_action(conn)
-
-      # second person registers
-
-      another_conn = build_conn()
-
-      {:ok, second_show_live, _html} =
-        live(another_conn, Routes.room_lobby_path(another_conn, :show, room))
-
-      second_show_live
-      |> form("#lobby-form",
-        nickname_form: %{
-          nickname: "hello2"
-        }
-      )
-      |> render_submit()
-
-      second_show_live
-      |> form("#lobby-form",
-        nickname_form: %{
-          nickname: "hello2"
-        },
-        return_to: Routes.room_lobby_path(another_conn, :show, room)
-      )
-      |> follow_trigger_action(another_conn)
-
-      third_conn = build_conn()
-
-      {:ok, _third_show_live, html} =
-        live(third_conn, Routes.room_lobby_path(third_conn, :show, room))
-
-      ["", _, slug, "lobby"] =
-        Routes.room_lobby_path(third_conn, :show, room) |> String.split("/")
-
-      assert html =~ "hello2"
-      assert html =~ "nickname1"
-    end
-
     test "registers nickname in room if exists in session", %{conn: conn, room: room} do
       conn = Plug.Test.init_test_session(conn, nickname: "hello")
 
@@ -183,45 +122,6 @@ defmodule SimpleVoteWeb.VoteLiveTest do
 
       {:ok, _show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
       refute {:ok, []} == SimpleVote.Rooms.NicknameRegistry.list(room_slug)
-    end
-
-    test "form shows validation errors when duplicate name", %{conn: conn, room: room} do
-      # setup! make a conn with nickname
-      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
-
-      show_live
-      |> form("#lobby-form",
-        nickname_form: %{
-          nickname: "nickname"
-        }
-      )
-      |> render_submit()
-
-      show_live
-      |> form("#lobby-form",
-        nickname_form: %{
-          nickname: "nickname"
-        },
-        return_to: Routes.room_lobby_path(conn, :show, room)
-      )
-      |> follow_trigger_action(conn)
-
-      # ok now make another conn and try to register with the same nickname there
-
-      another_conn = build_conn()
-
-      {:ok, another_show_live, _html} =
-        live(another_conn, Routes.room_lobby_path(another_conn, :show, room))
-
-      assert another_show_live
-             |> form("#lobby-form",
-               nickname_form: %{
-                 nickname: "nickname"
-               },
-               return_to: Routes.room_lobby_path(another_conn, :show, room)
-             )
-             |> render_submit() =~
-               "Someone already has this nickname!"
     end
 
     test "form shows validation errors when submitting empty nickname", %{conn: conn, room: room} do
@@ -242,7 +142,6 @@ defmodule SimpleVoteWeb.VoteLiveTest do
       conn: conn,
       room: room
     } do
-      # setup! make a conn with nickname
       {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
 
       assert show_live
@@ -253,6 +152,72 @@ defmodule SimpleVoteWeb.VoteLiveTest do
              )
              |> render_submit() =~
                "Nickname cannot be empty!"
+    end
+
+    defp live_register_nickname(room, nickname) do
+      conn = build_conn()
+
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      show_live
+      |> form("#lobby-form",
+        nickname_form: %{
+          nickname: nickname
+        }
+      )
+      |> render_submit()
+
+      triggered_conn =
+        show_live
+        |> form("#lobby-form",
+          nickname_form: %{
+            nickname: nickname
+          },
+          return_to: Routes.room_lobby_path(conn, :show, room)
+        )
+        |> follow_trigger_action(conn)
+
+      live(triggered_conn, Routes.room_lobby_path(triggered_conn, :show, room))
+    end
+
+    test "displays all registered people", %{
+      room: room
+    } do
+      # first person registers
+      live_register_nickname(room, "nickname1")
+      # second person registers
+      live_register_nickname(room, "nickname2")
+
+      # third person connects
+      third_conn = build_conn()
+
+      {:ok, _third_show_live, html} =
+        live(third_conn, Routes.room_lobby_path(third_conn, :show, room))
+
+      # assert that they see both previous nicknames
+      assert html =~ "nickname1"
+      assert html =~ "nickname2"
+    end
+
+    test "form shows validation errors when duplicate name", %{room: room} do
+      # first, register with a given nickname
+      live_register_nickname(room, "uniq-nickname")
+
+      # now, try to register another user with the same nickname
+      another_conn = build_conn()
+
+      {:ok, another_show_live, _html} =
+        live(another_conn, Routes.room_lobby_path(another_conn, :show, room))
+
+      assert another_show_live
+             |> form("#lobby-form",
+               nickname_form: %{
+                 nickname: "uniq-nickname"
+               },
+               return_to: Routes.room_lobby_path(another_conn, :show, room)
+             )
+             |> render_submit() =~
+               "Someone already has this nickname!"
     end
   end
 end
