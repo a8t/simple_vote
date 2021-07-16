@@ -4,6 +4,7 @@ defmodule SimpleVote.Rooms.Room do
 
   schema "rooms" do
     field :name, :string
+    field :state, Ecto.Enum, values: [:open, :closed]
     has_many :prompts, SimpleVote.Polls.Prompt
     belongs_to :owner, SimpleVote.Accounts.User, foreign_key: :owner_id
 
@@ -13,7 +14,7 @@ defmodule SimpleVote.Rooms.Room do
   @doc false
   def changeset(room, attrs) do
     room
-    |> cast(attrs, [:name, :owner_id])
+    |> cast(attrs, [:name, :owner_id, :state])
     |> validate_required([:name, :owner_id])
   end
 
