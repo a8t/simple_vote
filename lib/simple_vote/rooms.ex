@@ -91,6 +91,38 @@ defmodule SimpleVote.Rooms do
   end
 
   @doc """
+  Open a room.
+
+  ## Examples
+
+      iex> open_room(room)
+      {:ok, %Room{state: :open}}
+
+      iex> open_room(room)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def open_room(%Room{} = room) do
+    update_room(room, %{state: :open})
+  end
+
+  @doc """
+  Close a room.
+
+  ## Examples
+
+      iex> close_room(room)
+      {:ok, %Room{state: :closed}}
+
+      iex> close_room(room)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def close_room(%Room{} = room) do
+    update_room(room, %{state: :closed})
+  end
+
+  @doc """
   Deletes a room.
 
   ## Examples

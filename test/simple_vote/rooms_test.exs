@@ -65,6 +65,16 @@ defmodule SimpleVote.RoomsTest do
       room = insert(:room)
       assert %Ecto.Changeset{} = Rooms.change_room(room)
     end
+
+    test "open_room/1 opens room" do
+      room = insert(:room)
+      assert {:ok, %Room{state: :open}} = Rooms.open_room(room)
+    end
+
+    test "close_room/1 closes room" do
+      room = insert(:room)
+      assert {:ok, %Room{state: :closed}} = Rooms.close_room(room)
+    end
   end
 
   describe "room registry" do
