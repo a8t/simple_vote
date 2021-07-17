@@ -4,11 +4,10 @@ defmodule SimpleVote.RoomsTest do
   import SimpleVote.Factory
 
   alias SimpleVote.Rooms
+  alias SimpleVote.Rooms.Room
   alias SimpleVote.Repo
 
   describe "rooms" do
-    alias SimpleVote.Rooms.Room
-
     @valid_attrs %{name: "some name"}
     @update_attrs %{name: "some updated name"}
     @invalid_attrs %{name: nil}
@@ -74,6 +73,44 @@ defmodule SimpleVote.RoomsTest do
     test "close_room/1 closes room" do
       room = insert(:room)
       assert {:ok, %Room{state: :closed}} = Rooms.close_room(room)
+    end
+  end
+
+  describe "room pubsub utils" do
+    @pubsub SimpleVote.PubSub
+
+    test "make_topic/1 makes topic" do
+      room = insert(:room)
+
+      assert Rooms.make_topic(room.id) == "room:#{to_string(room.id)}"
+    end
+
+    test "subscribe/1 subscribes the current process" do
+      Rooms.subscribe(1)
+
+      Phoenix.PubSub.broadcast(@pubsub, Rooms.make_topic(1), :hello)
+
+      assert_received(:hello)
+    end
+  end
+
+  describe "room pubsub broadcasts" do
+    setup do
+      room = insert(:room)
+      Rooms.subscribe(room.id)
+      %{room: room}
+    end
+
+    test "open_room/1 broadcasts", %{room: room} do
+      Rooms.open_room(room)
+
+      assert_receive({:opened, %Room{}}, 100)
+    end
+
+    test "close_room/1 broadcasts", %{room: room} do
+      Rooms.close_room(room)
+
+      assert_receive({:closed, %Room{}}, 100)
     end
   end
 

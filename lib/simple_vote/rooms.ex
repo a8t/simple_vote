@@ -104,6 +104,7 @@ defmodule SimpleVote.Rooms do
   """
   def open_room(%Room{} = room) do
     update_room(room, %{state: :open})
+    |> broadcast(:opened)
   end
 
   @doc """
@@ -120,6 +121,7 @@ defmodule SimpleVote.Rooms do
   """
   def close_room(%Room{} = room) do
     update_room(room, %{state: :closed})
+    |> broadcast(:closed)
   end
 
   @doc """
@@ -149,5 +151,40 @@ defmodule SimpleVote.Rooms do
   """
   def change_room(%Room{} = room, attrs \\ %{}) do
     Room.changeset(room, attrs)
+  end
+
+  @pubsub SimpleVote.PubSub
+
+  @doc """
+  Subscribes the current process to the provided pubsub topic.
+
+  ## Examples
+
+      iex> subscribe(room)
+      %Ecto.Changeset{data: %Room{}}
+
+  """
+  def subscribe(room_id) do
+    Phoenix.PubSub.subscribe(@pubsub, make_topic(room_id))
+  end
+
+  defp broadcast({:error, _reason} = error, _event), do: error
+
+  defp broadcast({:ok, room}, event) do
+    Phoenix.PubSub.broadcast(@pubsub, make_topic(room.id), {event, room})
+    {:ok, room}
+  end
+
+  @doc """
+  Returns a topic for PubSub.
+
+  ## Examples
+
+      iex> make_topic(room_id)
+      "room:493"
+
+  """
+  def make_topic(room_id) do
+    "room:" <> to_string(room_id)
   end
 end
