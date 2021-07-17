@@ -106,7 +106,6 @@ defmodule SimpleVote.PollsTest do
     alias SimpleVote.Polls.Vote
 
     @update_attrs %{}
-    @invalid_attrs %{}
 
     test "list_votes/0 returns all votes" do
       vote = insert(:vote)
@@ -119,15 +118,36 @@ defmodule SimpleVote.PollsTest do
       assert Polls.get_vote!(vote.id).id == vote.id
     end
 
-    test "create_vote/1 with valid data creates a vote" do
-      user = insert(:user)
-      option = insert(:option)
+    test "get_option_room_state/1 works" do
+      room = insert(:room, state: :closed)
+      prompt = insert(:prompt, room: room)
+      option = insert(:option, prompt: prompt)
 
-      assert {:ok, %Vote{}} = Polls.create_vote(%{user_id: user.id, option_id: option.id})
+      assert {:ok, :closed} = Polls.get_option_room_state(option.id)
     end
 
-    test "create_vote/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Polls.create_vote(@invalid_attrs)
+    test "cast_vote/1 with valid data creates a vote when the room is open" do
+      voter_user = insert(:user)
+
+      room = insert(:room, state: :open)
+      prompt = insert(:prompt, room: room)
+      option = insert(:option, prompt: prompt)
+
+      assert {:ok, %Vote{option_id: option_id, user_id: voter_user_id}} =
+               Polls.cast_vote(voter_user.id, option.id)
+
+      assert option_id == option.id
+      assert voter_user_id == voter_user.id
+    end
+
+    test "cast_vote/1 with valid data fails when a vote is not open" do
+      voter_user = insert(:user)
+
+      room = insert(:room, state: :closed)
+      prompt = insert(:prompt, room: room)
+      option = insert(:option, prompt: prompt)
+
+      assert {:error, :room_not_open} = Polls.cast_vote(voter_user.id, option.id)
     end
 
     test "update_vote/2 with valid data updates the vote" do

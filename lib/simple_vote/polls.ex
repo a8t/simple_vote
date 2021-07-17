@@ -262,6 +262,31 @@ defmodule SimpleVote.Polls do
   def get_vote!(id), do: Vote |> preload([:option, :user]) |> Repo.get!(id)
 
   @doc """
+  Gets the state of the room associated with an option's prompt.
+
+  Raises `Ecto.NoResultsError` if the Vote does not exist.
+
+  ## Examples
+
+      iex> get_vote!(123)
+      %Vote{}
+
+      iex> get_vote!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_option_room_state(option_id) do
+    query = from o in Option, where: o.id == ^option_id
+
+    option =
+      query
+      |> preload(prompt: [:room])
+      |> Repo.one()
+
+    {:ok, option.prompt.room.state}
+  end
+
+  @doc """
   Creates a vote.
 
   ## Examples
@@ -273,10 +298,16 @@ defmodule SimpleVote.Polls do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_vote(attrs \\ %{}) do
-    %Vote{}
-    |> Vote.changeset(attrs)
-    |> Repo.insert()
+  def cast_vote(user_id, option_id) do
+    case get_option_room_state(option_id) do
+      {:ok, :open} ->
+        %Vote{}
+        |> Vote.changeset(%{user_id: user_id, option_id: option_id})
+        |> Repo.insert()
+
+      _ ->
+        {:error, :room_not_open}
+    end
   end
 
   @doc """
