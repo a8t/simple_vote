@@ -30,7 +30,18 @@
 <div class="w-full mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
   <section class="lg:col-start-3 lg:col-span-1">
     <div class="bg-white shadow sm:rounded-lg sticky top-8">
-      <div class="px-4 sm:px-6 py-5">
+      <div class="bg-green-50 p-4 mt-4">
+
+        <%= if @room.state == :open do %>
+          Room opened!
+        <% else %>
+          <button phx-click="open_room" id="open-room" class="button button-positive flex items-center self-end w-full" >
+            Open Room 
+          </button>
+        <% end %>
+
+      </div>
+      <div class="border-t border-gray-200 px-4 sm:px-6 py-5">
         <%= live_patch to: Routes.room_show_path(@socket, :edit, @room), id: "edit-room" do %>
           <span class="text-gray-500 text-xs">
             Room

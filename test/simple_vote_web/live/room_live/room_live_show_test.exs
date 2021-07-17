@@ -78,6 +78,30 @@ defmodule SimpleVoteWeb.RoomLiveShowTest do
     end
   end
 
+  describe "Opening room" do
+    setup [:create_room]
+
+    test "displays open room button", %{
+      authed_conn: authed_conn,
+      room: room
+    } do
+      {:ok, show_live, _html} = live(authed_conn, Routes.room_show_path(authed_conn, :show, room))
+
+      assert show_live |> has_element?("button#open-room")
+    end
+
+    test "clicking open room button opens room", %{
+      authed_conn: authed_conn,
+      room: room
+    } do
+      {:ok, show_live, html} = live(authed_conn, Routes.room_show_path(authed_conn, :show, room))
+      refute html =~ "Room opened!"
+      assert show_live |> element("button#open-room") |> render_click() =~ "Room opened!"
+
+      assert %{state: :open} = SimpleVote.Rooms.get_room!(room.id)
+    end
+  end
+
   @create_prompt_attrs %{body: "some body"}
   @update_prompt_attrs %{body: "some updated body"}
   @invalid_prompt_attrs %{body: nil}

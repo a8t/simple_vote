@@ -109,4 +109,10 @@ defmodule SimpleVoteWeb.RoomLive.Show do
 
     {:noreply, assign(socket, :prompts, Polls.list_room_prompts(room_id))}
   end
+
+  @impl true
+  def handle_event("open_room", _, socket) do
+    {:ok, room} = Rooms.open_room(socket.assigns.room)
+    {:noreply, assign(socket, room: room)}
+  end
 end
