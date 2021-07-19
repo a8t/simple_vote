@@ -53,6 +53,42 @@ defmodule SimpleVoteWeb.VoteLiveTest do
   describe "Lobby" do
     setup [:create_room]
 
+    defp refute_redirect(conn, path) do
+      try do
+        assert_redirect(conn, path)
+      rescue
+        e ->
+          assert %ArgumentError{message: message} = e
+          assert message =~ "to redirect to"
+      end
+    end
+
+    test "Doesn't redirect if user has no nickname", %{conn: conn, room: room} do
+      {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      SimpleVote.Rooms.open_room(room)
+
+      refute_redirect(show_live, Routes.room_vote_path(conn, :show, room))
+    end
+
+    test "Redirects to /vote if user has nickname when room opens", %{conn: conn, room: room} do
+      {:ok, show_live, _html} = live_register_nickname(room, "nickname1", conn)
+
+      SimpleVote.Rooms.open_room(room)
+
+      assert_redirect(show_live, Routes.room_vote_path(conn, :show, room))
+    end
+
+    test "Redirects to /vote if user sets nickname after room opens", %{conn: conn, room: room} do
+      {:ok, _show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
+
+      SimpleVote.Rooms.open_room(room)
+
+      {:ok, show_live, _html} = live_register_nickname(room, "nickname1", conn)
+
+      assert_redirect(show_live, Routes.room_vote_path(conn, :show, room))
+    end
+
     test "shows form", %{conn: conn, room: room} do
       {:ok, _show_live, html} = live(conn, Routes.room_lobby_path(conn, :show, room))
 
@@ -154,9 +190,7 @@ defmodule SimpleVoteWeb.VoteLiveTest do
                "Nickname cannot be empty!"
     end
 
-    defp live_register_nickname(room, nickname) do
-      conn = build_conn()
-
+    defp live_register_nickname(room, nickname, conn \\ build_conn()) do
       {:ok, show_live, _html} = live(conn, Routes.room_lobby_path(conn, :show, room))
 
       show_live

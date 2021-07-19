@@ -89,6 +89,13 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
         NicknameRegistry.register(slug, nickname)
 
         update_nickname_presence(socket, nickname)
+
+        # is this bad?
+        if room.state == :open do
+          send(self(), {:opened, room})
+        else
+          Rooms.subscribe(room_id)
+        end
       end
 
       socket =
@@ -209,5 +216,10 @@ defmodule SimpleVoteWeb.RoomLive.Lobby do
       |> assign(:other_users, get_other_users(socket.assigns.slug, socket.id))
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:opened, room}, socket) do
+    {:noreply, push_redirect(socket, to: Routes.room_vote_path(socket, :show, room))}
   end
 end
