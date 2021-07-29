@@ -4,7 +4,6 @@ defmodule SimpleVoteWeb.RoomLiveShowTest do
   import Phoenix.LiveViewTest
   import SimpleVote.Factory
 
-  @create_attrs %{name: "some name"}
   @update_attrs %{name: "some updated name"}
   @invalid_attrs %{name: nil}
 
