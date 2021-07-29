@@ -104,13 +104,13 @@ defmodule SimpleVote.RoomsTest do
     test "open_room/1 broadcasts", %{room: room} do
       Rooms.open_room(room)
 
-      assert_receive({:opened, %Room{}}, 100)
+      assert_received({:opened, %Room{}})
     end
 
     test "close_room/1 broadcasts", %{room: room} do
       Rooms.close_room(room)
 
-      assert_receive({:closed, %Room{}}, 100)
+      assert_received({:closed, %Room{}})
     end
   end
 

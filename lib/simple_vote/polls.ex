@@ -81,6 +81,7 @@ defmodule SimpleVote.Polls do
     %Prompt{}
     |> Prompt.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:prompt_created)
   end
 
   @doc """
@@ -99,6 +100,7 @@ defmodule SimpleVote.Polls do
     prompt
     |> Prompt.changeset(attrs)
     |> Repo.update()
+    |> broadcast(:prompt_updated)
   end
 
   @doc """
@@ -115,6 +117,7 @@ defmodule SimpleVote.Polls do
   """
   def delete_prompt(%Prompt{} = prompt) do
     Repo.delete(prompt)
+    |> broadcast(:prompt_deleted)
   end
 
   @doc """
@@ -181,6 +184,7 @@ defmodule SimpleVote.Polls do
     %Option{prompt: prompt}
     |> Option.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:option_created)
   end
 
   @doc """
@@ -199,6 +203,7 @@ defmodule SimpleVote.Polls do
     option
     |> Option.changeset(attrs)
     |> Repo.update()
+    |> broadcast(:option_updated)
   end
 
   @doc """
@@ -215,6 +220,7 @@ defmodule SimpleVote.Polls do
   """
   def delete_option(%Option{} = option) do
     Repo.delete(option)
+    |> broadcast(:option_deleted)
   end
 
   @doc """
@@ -355,5 +361,45 @@ defmodule SimpleVote.Polls do
   """
   def change_vote(%Vote{} = vote, attrs \\ %{}) do
     Vote.changeset(vote, attrs)
+  end
+
+  @pubsub SimpleVote.PubSub
+
+  @doc """
+  Subscribes the current process to the provided pubsub topic.
+
+  ## Examples
+
+      iex> subscribe(room)
+      :ok
+
+  """
+  def subscribe(room_id) do
+    Phoenix.PubSub.subscribe(@pubsub, make_topic(room_id))
+  end
+
+  defp broadcast({:error, _reason} = error, _event), do: error
+
+  defp broadcast({:ok, %Prompt{room_id: room_id} = prompt}, event) do
+    Phoenix.PubSub.broadcast(@pubsub, make_topic(room_id), {event, prompt})
+    {:ok, prompt}
+  end
+
+  defp broadcast({:ok, %Option{prompt: %{room_id: room_id}} = option}, event) do
+    Phoenix.PubSub.broadcast(@pubsub, make_topic(room_id), {event, option})
+    {:ok, option}
+  end
+
+  @doc """
+  Returns a topic for PubSub.
+
+  ## Examples
+
+      iex> make_topic(room_id)
+      "room:polls:493"
+
+  """
+  def make_topic(room_id) do
+    "room:polls:" <> to_string(room_id)
   end
 end

@@ -3,7 +3,25 @@ defmodule SimpleVote.PollsTest do
 
   import SimpleVote.Factory
 
-  use SimpleVote.DataCase
+  use SimpleVote.DataCase, async: true
+
+  describe "poll pubsub utils" do
+    @pubsub SimpleVote.PubSub
+
+    test "subscribe/1 subscribes the current process" do
+      Polls.subscribe("slug")
+
+      Phoenix.PubSub.broadcast(@pubsub, Polls.make_topic("slug"), :hello)
+
+      assert_received(:hello)
+    end
+  end
+
+  setup do
+    room = insert(:room)
+    Polls.subscribe(room.id)
+    %{room: room}
+  end
 
   describe "prompts" do
     alias SimpleVote.Polls.Prompt
@@ -21,34 +39,39 @@ defmodule SimpleVote.PollsTest do
       assert Polls.get_prompt!(prompt.id) == prompt
     end
 
-    test "create_prompt/1 with valid data creates a prompt" do
-      room = insert(:room)
-
+    test "create_prompt/1 with valid data creates a prompt", %{room: room} do
       assert {:ok, %Prompt{} = prompt} =
                Polls.create_prompt(%{body: "some body", room_id: room.id})
 
       assert prompt.body == "some body"
+      assert_received({:prompt_created, ^prompt})
     end
 
     test "create_prompt/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Polls.create_prompt(@invalid_attrs)
+      refute_received({:prompt_updated, _})
     end
 
-    test "update_prompt/2 with valid data updates the prompt" do
-      prompt = insert(:prompt)
+    test "update_prompt/2 with valid data updates the prompt", %{room: room} do
+      prompt = insert(:prompt, room: room)
       assert {:ok, %Prompt{} = prompt} = Polls.update_prompt(prompt, @update_attrs)
       assert prompt.body == "some updated body"
+      assert_received({:prompt_updated, ^prompt})
     end
 
     test "update_prompt/2 with invalid data returns error changeset" do
       prompt = insert(:prompt, options: [])
       assert {:error, %Ecto.Changeset{}} = Polls.update_prompt(prompt, @invalid_attrs)
+      refute_received({:prompt_updated, _})
+
       assert prompt == Polls.get_prompt!(prompt.id)
     end
 
-    test "delete_prompt/1 deletes the prompt" do
-      prompt = insert(:prompt)
+    test "delete_prompt/1 deletes the prompt", %{room: room} do
+      prompt = insert(:prompt, room: room)
       assert {:ok, %Prompt{}} = Polls.delete_prompt(prompt)
+      assert_received({:prompt_deleted, %Prompt{}})
+
       assert_raise Ecto.NoResultsError, fn -> Polls.get_prompt!(prompt.id) end
     end
 
@@ -65,34 +88,43 @@ defmodule SimpleVote.PollsTest do
     @update_attrs %{body: "some updated body"}
     @invalid_attrs %{body: nil}
 
-    test "create_option_for_prompt/1 with valid data creates a option" do
-      room = insert(:room)
+    test "create_option_for_prompt/1 with valid data creates a option", %{room: room} do
       prompt = insert(:prompt, room: room)
+
       assert {:ok, %Option{} = option} = Polls.create_option_for_prompt(prompt, @valid_attrs)
       assert option.body == "some body"
+      assert_received({:option_created, ^option})
     end
 
-    test "create_option_for_prompt/1 with invalid data returns error changeset" do
-      prompt = insert(:prompt)
+    test "create_option_for_prompt/1 with invalid data returns error changeset", %{room: room} do
+      prompt = insert(:prompt, room: room)
 
       assert {:error, %Ecto.Changeset{}} = Polls.create_option_for_prompt(prompt, @invalid_attrs)
+      refute_received({:option_created, _})
     end
 
-    test "update_option/2 with valid data updates the option" do
-      option = insert(:option)
+    test "update_option/2 with valid data updates the option", %{room: room} do
+      option = insert(:option, prompt: %{room: room})
+
       assert {:ok, %Option{} = option} = Polls.update_option(option, @update_attrs)
       assert option.body == "some updated body"
+      assert_received({:option_updated, %Option{}})
     end
 
     test "update_option/2 with invalid data returns error changeset" do
       option = insert(:option)
+
       assert {:error, %Ecto.Changeset{}} = Polls.update_option(option, @invalid_attrs)
       assert option.id == Polls.get_option!(option.id).id
+      refute_received({:option_updated, %Option{}})
     end
 
-    test "delete_option/1 deletes the option" do
-      option = insert(:option)
+    test "delete_option/1 deletes the option", %{room: room} do
+      option = insert(:option, prompt: %{room: room})
+
       assert {:ok, %Option{}} = Polls.delete_option(option)
+      assert_received({:option_deleted, %Option{}})
+
       assert_raise Ecto.NoResultsError, fn -> Polls.get_option!(option.id) end
     end
 
