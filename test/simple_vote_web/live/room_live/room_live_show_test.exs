@@ -126,7 +126,8 @@ defmodule SimpleVoteWeb.RoomLiveShowTest do
     end
 
     test "saves new prompt", %{authed_conn: authed_conn, room: room} do
-      {:ok, show_live, _html} = live(authed_conn, Routes.room_show_path(authed_conn, :show, room))
+      {:ok, show_live, html} = live(authed_conn, Routes.room_show_path(authed_conn, :show, room))
+      assert html =~ "1 prompt"
 
       assert show_live |> element("a#new-prompt") |> render_click() =~
                "New Prompt"
@@ -145,6 +146,7 @@ defmodule SimpleVoteWeb.RoomLiveShowTest do
 
       assert html =~ "Prompt created successfully"
       assert html =~ "some body"
+      assert html =~ "2 prompts"
     end
 
     test "updates prompt in listing", %{authed_conn: authed_conn, room: room, prompt: prompt} do
@@ -171,11 +173,13 @@ defmodule SimpleVoteWeb.RoomLiveShowTest do
     end
 
     test "deletes prompt in listing", %{authed_conn: authed_conn, room: room, prompt: prompt} do
-      {:ok, index_live, _html} =
-        live(authed_conn, Routes.room_show_path(authed_conn, :show, room))
+      {:ok, index_live, html} = live(authed_conn, Routes.room_show_path(authed_conn, :show, room))
+      assert html =~ "1 prompt"
 
-      assert index_live |> element("#prompt-#{prompt.id}-delete") |> render_click()
+      assert html = index_live |> element("#prompt-#{prompt.id}-delete") |> render_click()
+
       refute has_element?(index_live, "#prompt-#{prompt.id}")
+      assert html =~ "0 prompts"
     end
   end
 

@@ -55,10 +55,8 @@
         <% end %>
       </div>
 
-      <div class="border-t border-gray-200 px-4 sm:px-6 py-2">
-        <div class="mt-4">
-          <%= length(@room.prompts) %> prompts
-        </div>
+      <div class="px-4 sm:px-6 pb-2">
+        <%=   ngettext "1 prompt", "%{count} prompts", length(@prompts) %>
       </div>
 
       <div class="bg-indigo-50 p-4 mt-4">

@@ -95,3 +95,8 @@ msgstr ""
 
 msgid "must be equal to %{number}"
 msgstr ""
+
+msgid "1 prompt"
+msgid_plural "%{count} prompts"
+msgstr[0] "No prompts"
+msgstr[1] "1 prompt"
