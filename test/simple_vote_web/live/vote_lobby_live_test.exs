@@ -50,7 +50,7 @@ defmodule SimpleVoteWeb.VoteLiveTest do
     end
   end
 
-  describe "Lobby" do
+  describe "Lobby redirect when opening" do
     setup [:create_room]
 
     defp refute_redirect(conn, path) do
@@ -88,6 +88,10 @@ defmodule SimpleVoteWeb.VoteLiveTest do
 
       assert_redirect(show_live, Routes.room_vote_path(conn, :show, room))
     end
+  end
+
+  describe "Lobby nickname" do
+    setup [:create_room]
 
     test "shows form", %{conn: conn, room: room} do
       {:ok, _show_live, html} = live(conn, Routes.room_lobby_path(conn, :show, room))
