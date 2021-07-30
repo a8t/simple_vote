@@ -47,11 +47,17 @@ defmodule SimpleVoteWeb.RoomLive.Show do
   def handle_params(%{"prompt_id" => prompt_id, "option_id" => option_id}, _url, socket) do
     with prompt = %Prompt{} <- Polls.get_prompt!(prompt_id),
          option = %Option{} <- Polls.get_option!(option_id) do
+      room = socket.assigns.room
+
       socket =
         socket
         |> assign(:page_title, page_title(socket.assigns.live_action))
         |> assign(:prompt, prompt)
         |> assign(:option, option)
+        |> assign_new(
+          :prompts,
+          fn -> room.prompts end
+        )
 
       {:noreply, socket}
     else
