@@ -14,7 +14,8 @@ defmodule SimpleVote.Factory do
   def room_factory do
     %SimpleVote.Rooms.Room{
       owner: build(:user),
-      name: "room name"
+      name: "room name",
+      state: :closed
     }
   end
 
